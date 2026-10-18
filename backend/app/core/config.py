@@ -1,5 +1,5 @@
 from typing import List, Union
-from pydantic import AnyHttpUrl, field_validator
+from pydantic import AnyHttpUrl, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -83,6 +83,29 @@ class Settings(BaseSettings):
         elif isinstance(v, list):
             return [str(i).strip() for i in v if str(i).strip()]
         return []
+
+    @model_validator(mode="after")
+    def validate_production_security(self) -> "Settings":
+        """Strict production configuration integrity validation."""
+        if self.ENVIRONMENT == "production":
+            # 1. Enforce strong, non-default SECRET_KEY (min 64 hex characters / 256-bit entropy)
+            insecure_patterns = ["dev-secret-key", "replace-with", "change-in-production", "secret"]
+            if not self.SECRET_KEY or any(p in self.SECRET_KEY.lower() for p in insecure_patterns):
+                raise ValueError(
+                    "Insecure or default SECRET_KEY detected in production environment! "
+                    "Generate a cryptographically secure 64-byte key using 'openssl rand -hex 64'."
+                )
+            if len(self.SECRET_KEY) < 64:
+                raise ValueError(
+                    f"Production SECRET_KEY must be at least 64 characters (found {len(self.SECRET_KEY)}). "
+                    "Generate using 'openssl rand -hex 64'."
+                )
+
+            # 2. Enforce secure cookies in production
+            if not self.SESSION_COOKIE_SECURE:
+                self.SESSION_COOKIE_SECURE = True
+
+        return self
 
     model_config = SettingsConfigDict(
         env_file=".env",

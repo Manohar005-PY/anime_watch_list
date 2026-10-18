@@ -136,3 +136,71 @@ def test_password_reset_single_use_and_session_revocation(client):
 
     ok_res = client.post("/api/v1/auth/login", json={"email": email, "password": new_pwd})
     assert ok_res.status_code == 200
+
+
+def test_smtp_delivery_success_mocked_smtplib():
+    """Verify that SMTP provider correctly invokes starttls, auth, and sendmail."""
+    orig_prov = settings.EMAIL_PROVIDER
+    orig_host = settings.SMTP_HOST
+    orig_user = settings.SMTP_USER
+    orig_pass = settings.SMTP_PASSWORD
+
+    settings.EMAIL_PROVIDER = "smtp"
+    settings.SMTP_HOST = "smtp.sendgrid.net"
+    settings.SMTP_PORT = 587
+    settings.SMTP_USER = "apikey"
+    settings.SMTP_PASSWORD = "SG.mocked_key_for_testing"
+
+    with patch("smtplib.SMTP") as mock_smtp_cls:
+        mock_server = mock_smtp_cls.return_value
+        try:
+            success = EmailService.send_password_reset_email(
+                to_email="motoko.kusanagi@section9.gov",
+                token="test-secret-token-12345",
+                display_name="Major Motoko"
+            )
+            assert success is True
+            mock_smtp_cls.assert_called_once_with("smtp.sendgrid.net", 587, timeout=15)
+            mock_server.starttls.assert_called_once()
+            mock_server.login.assert_called_once_with("apikey", "SG.mocked_key_for_testing")
+            mock_server.sendmail.assert_called_once()
+            mock_server.quit.assert_called_once()
+        finally:
+            settings.EMAIL_PROVIDER = orig_prov
+            settings.SMTP_HOST = orig_host
+            settings.SMTP_USER = orig_user
+            settings.SMTP_PASSWORD = orig_pass
+
+
+def test_smtp_socket_failure_returns_false_safely():
+    """Verify that network or socket errors during SMTP dispatch fail safely without crashing."""
+    import smtplib
+    orig_prov = settings.EMAIL_PROVIDER
+    orig_host = settings.SMTP_HOST
+
+    settings.EMAIL_PROVIDER = "smtp"
+    settings.SMTP_HOST = "smtp.sendgrid.net"
+
+    with patch("smtplib.SMTP", side_effect=smtplib.SMTPConnectError(421, "Connection refused")):
+        try:
+            success = EmailService.send_password_reset_email(
+                to_email="batou@section9.gov",
+                token="test-secret-token-67890"
+            )
+            assert success is False
+        finally:
+            settings.EMAIL_PROVIDER = orig_prov
+            settings.SMTP_HOST = orig_host
+
+
+def test_password_reset_nonexistent_email_prevents_user_enumeration(client):
+    """Verify that requesting reset for unknown email returns 200 without sending email or leaking user existence."""
+    with patch.object(EmailService, "send_password_reset_email") as mock_send:
+        res = client.post("/api/v1/auth/password-reset/request", json={
+            "email": "definitely_does_not_exist@kage.internal"
+        })
+        assert res.status_code == 200
+        assert res.json()["message"] == "If an account exists with that email, password reset instructions have been sent."
+        # No email should be sent for nonexistent accounts
+        mock_send.assert_not_called()
+

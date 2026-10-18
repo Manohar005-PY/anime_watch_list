@@ -9,13 +9,14 @@ spec:
     metadata:
       annotations:
         autoscaling.knative.dev/minScale: "0"
-        autoscaling.knative.dev/maxScale: "10"
+        autoscaling.knative.dev/maxScale: "6"
         run.googleapis.com/execution-environment: gen2
     spec:
+      serviceAccountName: "kage-cloudrun-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
       containerConcurrency: 80
       timeoutSeconds: 300
       containers:
-        - image: "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/kage-containers/kage-frontend:latest"
+        - image: "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GAR_REPO}/kage-frontend:${IMAGE_TAG}"
           ports:
             - containerPort: 3000
           resources:
@@ -26,7 +27,9 @@ spec:
             - name: NODE_ENV
               value: "production"
             - name: NEXT_PUBLIC_API_URL
-              value: "https://kage-api-${PROJECT_NUMBER}.${GCP_REGION}.run.app/api/v1"
+              value: "/api/v1"
+            - name: BACKEND_INTERNAL_URL
+              value: "https://kage-api-${GCP_PROJECT_ID}.a.run.app"
           livenessProbe:
             httpGet:
               path: /

@@ -32,7 +32,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
-      - name: Run Pytest Suite with Security Checks
+      - name: Run Pytest Suite with Security & CSRF Checks
         run: |
           cd backend
           pytest -v --maxfail=1
@@ -56,7 +56,7 @@ jobs:
           cd frontend
           npm ci
 
-      - name: Build Next.js
+      - name: Build Next.js Production Bundle
         run: |
           cd frontend
           npm run build
@@ -83,7 +83,7 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Configure Docker for Artifact Registry
+      - name: Configure Docker for Regional Artifact Registry
         run: |
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
@@ -105,8 +105,11 @@ jobs:
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/kage-frontend:${{ github.sha }}
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/kage-frontend:latest
 
-      - name: Run Database Migration Release Step
+      - name: Update & Execute Database Migration Release Job
         run: |
+          gcloud run jobs update kage-db-migrate \
+            --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/kage-backend:${{ github.sha }} \
+            --region=${{ env.REGION }}
           gcloud run jobs execute kage-db-migrate --region=${{ env.REGION }} --wait
 
       - name: Deploy Backend Service to Cloud Run

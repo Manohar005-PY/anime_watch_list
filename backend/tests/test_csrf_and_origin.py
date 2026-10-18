@@ -108,3 +108,103 @@ def test_end_to_end_csrf_rejection_on_stolen_session(client, user_a, user_b):
     # Must fail with 403 Forbidden because signature and session-binding are invalid!
     assert res.status_code == 403
     assert "CSRF validation failed" in res.json()["detail"]
+
+
+def test_csrf_bootstrap_endpoint_unauthenticated(client):
+    """Verify that unauthenticated clients can bootstrap an anonymous CSRF token."""
+    res = client.get("/api/v1/auth/csrf-token")
+    assert res.status_code == 200
+    data = res.json()
+    assert "csrf_token" in data
+    token = data["csrf_token"]
+    assert verify_csrf_token(token) is True
+    # Cookie must also be set
+    assert settings.CSRF_COOKIE_NAME in res.cookies
+
+
+def test_csrf_bootstrap_endpoint_authenticated(client):
+    """Verify that authenticated clients receive a session-bound CSRF token on bootstrap."""
+    email = "bootstrap_user@kage.internal"
+    pwd = "ValidPassword123!"
+    client.post("/api/v1/auth/register", json={"email": email, "password": pwd})
+    login_res = client.post("/api/v1/auth/login", json={"email": email, "password": pwd})
+    assert login_res.status_code == 200
+    session_token = login_res.cookies.get(settings.SESSION_COOKIE_NAME)
+    assert session_token is not None
+
+    res = client.get("/api/v1/auth/csrf-token")
+    assert res.status_code == 200
+    token = res.json()["csrf_token"]
+    # Must verify against the active session token
+    assert verify_csrf_token(token, session_token=session_token) is True
+
+
+def test_login_returns_session_bound_csrf_token(client):
+    """Verify that login response includes csrf_token in the JSON body."""
+    email = "login_csrf@kage.internal"
+    pwd = "ValidPassword123!"
+    client.post("/api/v1/auth/register", json={"email": email, "password": pwd})
+    login_res = client.post("/api/v1/auth/login", json={"email": email, "password": pwd})
+    assert login_res.status_code == 200
+    data = login_res.json()
+    assert "csrf_token" in data
+    assert data["csrf_token"] is not None
+    session_token = login_res.cookies.get(settings.SESSION_COOKIE_NAME)
+    assert verify_csrf_token(data["csrf_token"], session_token=session_token) is True
+
+
+def test_valid_browser_session_performs_legitimate_mutations(client):
+    """Verify that valid browser session with matching CSRF header can perform mutations."""
+    email = "mutation_test@kage.internal"
+    pwd = "ValidPassword123!"
+    client.post("/api/v1/auth/register", json={"email": email, "password": pwd})
+    login_res = client.post("/api/v1/auth/login", json={"email": email, "password": pwd})
+    assert login_res.status_code == 200
+    csrf_token = login_res.json()["csrf_token"]
+
+    # 1. Create anime with CSRF header
+    create_res = client.post(
+        "/api/v1/anime",
+        json={"title": "Trigun Stampede", "status": "WATCHING", "total_episodes": 12},
+        headers={"X-CSRF-Token": csrf_token}
+    )
+    assert create_res.status_code == 201
+    anime_id = create_res.json()["id"]
+
+    # 2. Update progress
+    progress_res = client.patch(
+        f"/api/v1/anime/{anime_id}/progress",
+        json={"watched_episodes": 6},
+        headers={"X-CSRF-Token": csrf_token}
+    )
+    assert progress_res.status_code == 200
+    assert progress_res.json()["watched_episodes"] == 6
+
+    # 3. Missing CSRF header on mutation must fail with 403
+    fail_res = client.patch(
+        f"/api/v1/anime/{anime_id}/progress",
+        json={"watched_episodes": 7}
+    )
+    assert fail_res.status_code == 403
+
+
+def test_hostile_origin_rejected_on_mutation(client):
+    """Verify that state-changing requests from untrusted origins are blocked with 403."""
+    email = "hostile_origin@kage.internal"
+    pwd = "ValidPassword123!"
+    client.post("/api/v1/auth/register", json={"email": email, "password": pwd})
+    login_res = client.post("/api/v1/auth/login", json={"email": email, "password": pwd})
+    csrf_token = login_res.json()["csrf_token"]
+
+    # Request from hostile origin
+    res = client.post(
+        "/api/v1/anime",
+        json={"title": "Hellsing", "status": "PLANNED"},
+        headers={
+            "X-CSRF-Token": csrf_token,
+            "Origin": "https://evil-phishing-site.com"
+        }
+    )
+    assert res.status_code == 403
+    assert "Cross-site request rejected" in res.json()["detail"]
+

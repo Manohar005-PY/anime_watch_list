@@ -78,7 +78,7 @@ export interface PersonalDataExport {
   entries: AnimeEntry[];
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
 
 class ApiError extends Error {
   status: number;
@@ -89,10 +89,38 @@ class ApiError extends Error {
   }
 }
 
-function getCsrfToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(?:^|;\s*)kage_csrf=([^;]+)/);
-  return match ? decodeURIComponent(match[1]) : null;
+// In-memory token storage for environments where cross-origin host-only cookies cannot be read by JS
+let activeCsrfToken: string | null = null;
+
+export function setActiveCsrfToken(token: string | null): void {
+  activeCsrfToken = token;
+}
+
+export function getCsrfToken(): string | null {
+  if (typeof document !== "undefined") {
+    const match = document.cookie.match(/(?:^|;\s*)kage_csrf=([^;]+)/);
+    if (match) return decodeURIComponent(match[1]);
+  }
+  return activeCsrfToken;
+}
+
+export async function bootstrapCsrfToken(): Promise<string | null> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/csrf-token`, {
+      method: "GET",
+      credentials: "include",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.csrf_token) {
+        activeCsrfToken = data.csrf_token;
+        return data.csrf_token;
+      }
+    }
+  } catch {
+    // Non-fatal, fallback to cookie or active token
+  }
+  return getCsrfToken();
 }
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -103,10 +131,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers.set("Content-Type", "application/json");
   }
 
-  // Attach OWASP double-submit CSRF token for mutating requests
+  // Attach OWASP session-bound CSRF token for mutating requests
   const method = (options.method || "GET").toUpperCase();
   if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !headers.has("X-CSRF-Token")) {
-    const token = getCsrfToken();
+    let token = getCsrfToken();
+    if (!token && typeof window !== "undefined") {
+      token = await bootstrapCsrfToken();
+    }
     if (token) {
       headers.set("X-CSRF-Token", token);
     }
@@ -143,13 +174,30 @@ export const authApi = {
   register: (payload: { email: string; password: string; display_name?: string }) =>
     request<User>("/auth/register", { method: "POST", body: JSON.stringify(payload) }),
 
-  login: (payload: { email: string; password: string }) =>
-    request<{ user_id: string; email: string; display_name?: string; message: string }>("/auth/login", {
+  login: async (payload: { email: string; password: string }) => {
+    const res = await request<{
+      user_id: string;
+      email: string;
+      display_name?: string;
+      message: string;
+      csrf_token?: string;
+    }>("/auth/login", {
       method: "POST",
       body: JSON.stringify(payload),
-    }),
+    });
+    if (res.csrf_token) {
+      setActiveCsrfToken(res.csrf_token);
+    }
+    return res;
+  },
 
-  logout: () => request<{ message: string }>("/auth/logout", { method: "POST" }),
+  logout: async () => {
+    try {
+      return await request<{ message: string }>("/auth/logout", { method: "POST" });
+    } finally {
+      setActiveCsrfToken(null);
+    }
+  },
 
   getMe: () => request<User>("/auth/me"),
 

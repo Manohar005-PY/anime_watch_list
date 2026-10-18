@@ -1,8 +1,9 @@
+from __future__ import annotations
 import hashlib
 import secrets
 import time
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 import argon2
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
 
@@ -181,9 +182,14 @@ def validate_request_origin(origin_header: Optional[str], referer_header: Option
 
     normalized_origin = f"{parsed.scheme}://{parsed.netloc}"
 
-    # In non-production, permit testserver, localhost, and 127.0.0.1
+    # In non-production, permit testserver, localhost, 127.0.0.1, and 0.0.0.0
     if settings.ENVIRONMENT != "production":
-        if parsed.netloc.startswith("localhost") or parsed.netloc.startswith("127.0.0.1") or parsed.netloc == "testserver":
+        if (
+            parsed.netloc.startswith("localhost")
+            or parsed.netloc.startswith("127.0.0.1")
+            or parsed.netloc.startswith("0.0.0.0")
+            or parsed.netloc == "testserver"
+        ):
             return True, "Allowed dev/test origin."
 
     # Normalize allowed origins for exact comparison

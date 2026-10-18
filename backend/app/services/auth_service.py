@@ -134,7 +134,7 @@ class AuthService:
             path="/"
         )
 
-        return user, raw_token
+        return user, raw_token, csrf_token
 
     @staticmethod
     def get_current_user_from_token(db: Session, token: str) -> Optional[User]:

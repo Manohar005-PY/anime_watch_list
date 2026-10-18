@@ -117,26 +117,34 @@ async def security_and_timing_middleware(request: Request, call_next):
         f'status={response.status_code} request_id={request_id} duration_ms={duration_ms}'
     )
 
-    # Issue Signed, Session-Bound CSRF cookie if not present or if unverified for current session
-    session_cookie = request.cookies.get(settings.SESSION_COOKIE_NAME)
-    current_csrf = request.cookies.get(settings.CSRF_COOKIE_NAME)
-
-    needs_new_csrf = not current_csrf or (
-        session_cookie and not verify_csrf_token(current_csrf, session_token=session_cookie)
+    # Issue Signed, Session-Bound CSRF cookie if not present or if unverified for current session.
+    # Do not override if the response already sets a CSRF cookie (e.g. login, csrf-token endpoints).
+    response_has_csrf = any(
+        val.startswith(f"{settings.CSRF_COOKIE_NAME}=".encode("utf-8"))
+        for key, val in response.raw_headers
+        if key.lower() == b"set-cookie"
     )
 
-    if needs_new_csrf:
-        csrf_token = generate_csrf_token(session_token=session_cookie)
-        response.set_cookie(
-            key=settings.CSRF_COOKIE_NAME,
-            value=csrf_token,
-            path="/",
-            domain=None,  # Host-only cookie: forbids sibling subdomains from setting/overwriting
-            httponly=False,  # Client JS reads this to set X-CSRF-Token header
-            secure=settings.SESSION_COOKIE_SECURE,
-            samesite="lax",
-            max_age=settings.SESSION_MAX_AGE_SECONDS
+    if not response_has_csrf:
+        session_cookie = request.cookies.get(settings.SESSION_COOKIE_NAME)
+        current_csrf = request.cookies.get(settings.CSRF_COOKIE_NAME)
+
+        needs_new_csrf = not current_csrf or (
+            session_cookie and not verify_csrf_token(current_csrf, session_token=session_cookie)
         )
+
+        if needs_new_csrf:
+            csrf_token = generate_csrf_token(session_token=session_cookie)
+            response.set_cookie(
+                key=settings.CSRF_COOKIE_NAME,
+                value=csrf_token,
+                path="/",
+                domain=None,  # Host-only cookie: forbids sibling subdomains from setting/overwriting
+                httponly=False,  # Client JS reads this to set X-CSRF-Token header
+                secure=settings.SESSION_COOKIE_SECURE,
+                samesite="lax",
+                max_age=settings.SESSION_MAX_AGE_SECONDS
+            )
 
     # Set security headers
     response.headers["X-Request-ID"] = request_id

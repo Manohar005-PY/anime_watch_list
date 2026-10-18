@@ -32,3 +32,8 @@ class AuthResponse(BaseModel):
     email: str
     display_name: Optional[str] = None
     message: str = "Authenticated successfully"
+    csrf_token: Optional[str] = None
+
+
+class CsrfTokenResponse(BaseModel):
+    csrf_token: str

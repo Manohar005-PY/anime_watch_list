@@ -11,13 +11,41 @@ from app.schemas.auth import (
     PasswordResetRequest,
     PasswordResetConfirm,
     ChangePasswordRequest,
-    AuthResponse
+    AuthResponse,
+    CsrfTokenResponse
 )
 from app.schemas.user import UserResponse
 from app.schemas.common import MessageResponse
 from app.services.auth_service import AuthService
+from app.core.security import generate_csrf_token
 
 router = APIRouter()
+
+
+@router.get("/csrf-token", response_model=CsrfTokenResponse)
+def get_csrf_token(
+    request: Request,
+    response: Response
+):
+    """
+    Retrieve or bootstrap a signed CSRF token.
+    Protected by exact-origin policy on mutations and credentialed CORS.
+    If authenticated via session cookie, token is cryptographically bound to the active session.
+    If unauthenticated, token is signed with an ephemeral pre-auth nonce.
+    Sets the host-only cookie and returns the token in JSON.
+    """
+    session_cookie = request.cookies.get(settings.SESSION_COOKIE_NAME)
+    csrf_token = generate_csrf_token(session_token=session_cookie)
+    response.set_cookie(
+        key=settings.CSRF_COOKIE_NAME,
+        value=csrf_token,
+        max_age=settings.SESSION_MAX_AGE_SECONDS,
+        httponly=False,
+        secure=settings.SESSION_COOKIE_SECURE,
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        path="/"
+    )
+    return CsrfTokenResponse(csrf_token=csrf_token)
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -39,15 +67,16 @@ def login(
     response: Response,
     db: Session = Depends(get_db)
 ):
-    """Authenticate with email and password, setting a secure HttpOnly session cookie."""
+    """Authenticate with email and password, setting a secure HttpOnly session cookie and returning session-bound CSRF token."""
     client_ip = request.client.host if request.client else "unknown"
     user_agent = request.headers.get("User-Agent")
-    user, token = AuthService.login_user(db, request_data, client_ip, user_agent, response)
+    user, token, csrf_token = AuthService.login_user(db, request_data, client_ip, user_agent, response)
     return AuthResponse(
         user_id=user.id,
         email=user.email,
         display_name=user.display_name,
-        message="Login successful"
+        message="Login successful",
+        csrf_token=csrf_token
     )
 
 

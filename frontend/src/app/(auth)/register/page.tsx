@@ -79,7 +79,7 @@ export default function RegisterPage() {
             <div className="relative z-10 my-auto py-8">
               <div className="space-y-3 font-mono text-xs sm:text-sm text-neutral-300 border border-kage-border bg-black/60 p-6 backdrop-blur-xs">
                 <span className="font-mono text-[10px] text-kage-text-muted uppercase tracking-widest block mb-2">
-                  // MEMBERSHIP SPECIFICATIONS //
+                  {"// MEMBERSHIP SPECIFICATIONS //"}
                 </span>
                 <div className="flex items-center space-x-2.5">
                   <CheckCircle2 className="h-4 w-4 text-white shrink-0" />

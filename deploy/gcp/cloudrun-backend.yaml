@@ -9,19 +9,23 @@ spec:
     metadata:
       annotations:
         autoscaling.knative.dev/minScale: "0"
-        # Connection Budget: Cloud SQL max_connections=100.
-        # Reserves: 5 system + 10 DBA + 10 migrations/cron = 25. Available web pool ceiling = 75.
-        # Per container: 1 process * (4 steady + 4 overflow) = 8 max connections.
+        # Connection Budget & Pool Sizing:
+        # Cloud SQL max_connections = 100 (verify exact instance tier in GCP console).
+        # Dedicated Reserves: 5 system + 10 DBA/monitoring + 10 migrations/cron = 25 reserved.
+        # Max Available for Web Service pool = 75 connections ceiling.
+        # Per container instance: 1 Uvicorn worker * (4 steady-state + 4 overflow) = 8 connections max.
         # Max scale = 6 instances -> 6 * 8 = 48 peak connections (safe headroom of 27 connections / 36%).
         autoscaling.knative.dev/maxScale: "6"
-        run.googleapis.com/cloudsql-instances: "${GCP_PROJECT_ID}:${GCP_REGION}:kage-postgres-prod"
+        run.googleapis.com/cloudsql-instances: "${GCP_PROJECT_ID}:${GCP_REGION}:${CLOUD_SQL_INSTANCE}"
         run.googleapis.com/execution-environment: gen2
     spec:
       serviceAccountName: "kage-cloudrun-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
-      containerConcurrency: 80
+      # Concurrency: set conservatively to 16 (matching ~2x database pool capacity of 8 per container).
+      # Prevents request queue saturation and 15s pool timeouts under concurrent database load.
+      containerConcurrency: 16
       timeoutSeconds: 300
       containers:
-        - image: "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/kage-containers/kage-backend:latest"
+        - image: "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GAR_REPO}/kage-backend:${IMAGE_TAG}"
           ports:
             - containerPort: 8000
           resources:
@@ -50,7 +54,7 @@ spec:
             - name: SESSION_COOKIE_SAMESITE
               value: "lax"
             - name: BACKEND_CORS_ORIGINS
-              value: "https://kage.app,https://kage-web-prod.run.app"
+              value: "${FRONTEND_ORIGIN}"
             - name: METADATA_PROVIDER
               value: "kitsu"
             - name: SCHEDULER_SECRET_TOKEN
@@ -58,6 +62,27 @@ spec:
                 secretKeyRef:
                   name: KAGE_SCHEDULER_SECRET_TOKEN
                   key: latest
+            - name: EMAIL_PROVIDER
+              value: "smtp"
+            - name: SMTP_HOST
+              value: "${SMTP_HOST}"
+            - name: SMTP_PORT
+              value: "587"
+            - name: SMTP_USER
+              value: "${SMTP_USER}"
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: KAGE_SMTP_PASSWORD
+                  key: latest
+            - name: SMTP_TLS
+              value: "true"
+            - name: EMAILS_FROM_EMAIL
+              value: "${EMAILS_FROM_EMAIL}"
+            - name: EMAILS_FROM_NAME
+              value: "KAGE Anime Library"
+            - name: FRONTEND_URL
+              value: "${FRONTEND_ORIGIN}"
           livenessProbe:
             httpGet:
               path: /health

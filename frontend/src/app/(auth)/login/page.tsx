@@ -68,7 +68,7 @@ export default function LoginPage() {
             <div className="relative z-10 my-auto py-8">
               <div className="border border-kage-border bg-black/60 p-6 backdrop-blur-xs">
                 <span className="font-mono text-[10px] text-kage-text-muted uppercase tracking-widest block mb-2">
-                  // PRIVATE COLLECTION //
+                  {"// PRIVATE COLLECTION //"}
                 </span>
                 <p className="text-base text-neutral-200 font-medium leading-relaxed">
                   A distraction-free, personal anime library. Track your progress, rate your favorites, and revisit your archive without ads or social noise.
