@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kage_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kage
+      POSTGRES_PASSWORD: kage_dev_secret
+      POSTGRES_DB: kage_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - kage_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kage -d kage_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kage_backend
+    restart: unless-stopped
+    environment:
+      PROJECT_NAME: "KAGE"
+      ENVIRONMENT: "development"
+      DEBUG: "true"
+      DATABASE_URL: "postgresql://kage:kage_dev_secret@postgres:5432/kage_db"
+      SECRET_KEY: "dev-secret-key-change-in-production-kage-super-secret-key-minimum-32-chars"
+      SESSION_COOKIE_SECURE: "false"
+      BACKEND_CORS_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kage_frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:8000/api/v1"
+      NODE_ENV: "production"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  kage_pgdata:
+    driver: local

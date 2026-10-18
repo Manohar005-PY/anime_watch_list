@@ -1,0 +1,61 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: kage-api
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/cloudsql-instances: "${GCP_PROJECT_ID}:${GCP_REGION}:kage-postgres-prod"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      serviceAccountName: "kage-cloudrun-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      containers:
+        - image: "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/kage-containers/kage-backend:latest"
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          env:
+            - name: PROJECT_NAME
+              value: "KAGE"
+            - name: ENVIRONMENT
+              value: "production"
+            - name: DEBUG
+              value: "false"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: KAGE_DATABASE_URL
+                  key: latest
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: KAGE_SECRET_KEY
+                  key: latest
+            - name: SESSION_COOKIE_SECURE
+              value: "true"
+            - name: SESSION_COOKIE_SAMESITE
+              value: "lax"
+            - name: BACKEND_CORS_ORIGINS
+              value: "https://kage.app,https://kage-web-prod.run.app"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10

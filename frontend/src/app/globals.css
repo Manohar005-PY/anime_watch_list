@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #080808;
+  --foreground: #F5F5F5;
+}
+
+/* Base typography & rendering settings honoring modern-web-guidance */
+html {
+  background-color: #080808;
+  color: #F5F5F5;
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: #080808;
+  color: #F5F5F5;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Text balance for editorial headlines */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  letter-spacing: -0.025em;
+}
+
+p {
+  text-wrap: pretty;
+  max-width: 80ch;
+}
+
+/* Restrained monochrome scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #262626 #080808;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #080808;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 0px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #525252;
+}
+
+/* Focus visibility */
+:focus-visible {
+  outline: 1px solid #737373;
+  outline-offset: 2px;
+}
+
+/* Subtle procedural film grain overlay via CSS radial gradient */
+.cinematic-grain {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.015) 0%, transparent 100%),
+    linear-gradient(rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.008) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+}
+
+/* Manga panel border styling */
+.manga-panel {
+  border: 1px solid #262626;
+  background-color: #121212;
+  transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.manga-panel:hover {
+  border-color: #525252;
+}
+
+/* Reduced motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

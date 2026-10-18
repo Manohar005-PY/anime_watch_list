@@ -1,0 +1,27 @@
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: kage-db-migrate
+spec:
+  template:
+    spec:
+      template:
+        metadata:
+          annotations:
+            run.googleapis.com/cloudsql-instances: "${GCP_PROJECT_ID}:${GCP_REGION}:kage-postgres-prod"
+            run.googleapis.com/execution-environment: gen2
+        spec:
+          serviceAccountName: "kage-cloudrun-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+          containers:
+            - image: "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/kage-containers/kage-backend:latest"
+              command: ["alembic", "upgrade", "head"]
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: KAGE_DATABASE_URL
+                      key: latest
+              resources:
+                limits:
+                  cpu: "1000m"
+                  memory: "512Mi"
