@@ -103,9 +103,9 @@ export default function PrivacyPage() {
 
                 <div className="border border-kage-border bg-kage-surface p-4">
                   <div className="font-bold text-white mb-1">kage_csrf</div>
-                  <div className="text-kage-text-muted mb-2">Scope: SameSite=Lax, Secure</div>
+                  <div className="text-kage-text-muted mb-2">Scope: SameSite=Lax, Secure (Host-Only)</div>
                   <p className="text-neutral-300">
-                    Double-submit CSRF cookie token used to verify that every state-changing API request (POST, PUT, DELETE) originates intentionally from your verified browser tab.
+                    Cryptographically signed HMAC-SHA256 token cryptographically bound to your active session hash. Validated alongside strict exact-origin checks to guarantee state-changing API requests (POST, PUT, DELETE) originate only from your authentic browser tab.
                   </p>
                 </div>
               </div>
@@ -194,8 +194,8 @@ export default function PrivacyPage() {
                     <span>Memory-hard password derivation with cryptographic salt per user.</span>
                   </div>
                   <div className="border border-kage-border bg-kage-surface p-3">
-                    <span className="text-white font-bold block mb-1">Double-Submit CSRF</span>
-                    <span>Strict Origin header verification + cookie-to-header token pairing.</span>
+                    <span className="text-white font-bold block mb-1">Session-Bound CSRF</span>
+                    <span>HMAC-SHA256 signed, session-tied tokens with strict exact-origin checks.</span>
                   </div>
                   <div className="border border-kage-border bg-kage-surface p-3">
                     <span className="text-white font-bold block mb-1">Data Isolation</span>

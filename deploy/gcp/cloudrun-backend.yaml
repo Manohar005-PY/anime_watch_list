@@ -9,7 +9,11 @@ spec:
     metadata:
       annotations:
         autoscaling.knative.dev/minScale: "0"
-        autoscaling.knative.dev/maxScale: "10"
+        # Connection Budget: Cloud SQL max_connections=100.
+        # Reserves: 5 system + 10 DBA + 10 migrations/cron = 25. Available web pool ceiling = 75.
+        # Per container: 1 process * (4 steady + 4 overflow) = 8 max connections.
+        # Max scale = 6 instances -> 6 * 8 = 48 peak connections (safe headroom of 27 connections / 36%).
+        autoscaling.knative.dev/maxScale: "6"
         run.googleapis.com/cloudsql-instances: "${GCP_PROJECT_ID}:${GCP_REGION}:kage-postgres-prod"
         run.googleapis.com/execution-environment: gen2
     spec:

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, AlertCircle, ArrowRight, ShieldCheck, Film } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { AppHeader } from "@/components/layout/AppHeader";
-import { AnimeQuoteCard } from "@/components/ui/AnimeQuoteCard";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -65,12 +64,24 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Authentic Anime Quotation Component */}
+            {/* Personal Library Overview Card */}
             <div className="relative z-10 my-auto py-8">
-              <AnimeQuoteCard variant="panel" />
+              <div className="border border-kage-border bg-black/60 p-6 backdrop-blur-xs">
+                <span className="font-mono text-[10px] text-kage-text-muted uppercase tracking-widest block mb-2">
+                  // PRIVATE COLLECTION //
+                </span>
+                <p className="text-base text-neutral-200 font-medium leading-relaxed">
+                  A distraction-free, personal anime library. Track your progress, rate your favorites, and revisit your archive without ads or social noise.
+                </p>
+                <div className="mt-4 flex items-center space-x-3 font-mono text-[11px] text-kage-text-secondary">
+                  <span>Single-User Privacy</span>
+                  <span>•</span>
+                  <span>PostgreSQL 16</span>
+                </div>
+              </div>
             </div>
 
-            <div className="relative z-10 border-t border-neutral-800 pt-4 font-mono text-xs text-neutral-500 flex items-center justify-between">
+            <div className="relative z-10 border-t border-neutral-800 pt-4 font-mono text-xs text-neutral-400 flex items-center justify-between">
               <span>SECURE LOGIN</span>
               <span>24 FPS</span>
             </div>
@@ -91,11 +102,6 @@ export default function LoginPage() {
                 <div className="flex h-9 w-9 items-center justify-center border border-kage-border text-white text-sm font-mono font-bold">
                   影
                 </div>
-              </div>
-
-              {/* Mobile-Only Quote Showcase */}
-              <div className="block lg:hidden mt-5">
-                <AnimeQuoteCard variant="compact" />
               </div>
 
               {error && (

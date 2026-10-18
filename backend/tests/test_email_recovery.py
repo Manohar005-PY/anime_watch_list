@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 from app.services.email_service import EmailService
 from app.core.config import settings
 
@@ -40,20 +41,98 @@ def test_password_reset_email_dispatch_mock():
         EmailService.sent_emails.clear()
 
 
+def test_production_fails_safely_when_email_missing(client):
+    """In production, missing SMTP configuration MUST fail safely with 503, never fall back to console."""
+    orig_env = settings.ENVIRONMENT
+    orig_host = settings.SMTP_HOST
+    orig_prov = settings.EMAIL_PROVIDER
+    settings.ENVIRONMENT = "production"
+    settings.EMAIL_PROVIDER = "smtp"
+    settings.SMTP_HOST = None  # Missing SMTP config
+
+    email = "misconfigured@kage.internal"
+    client.post("/api/v1/auth/register", json={"email": email, "password": "Password123!"})
+
+    try:
+        res = client.post("/api/v1/auth/password-reset/request", json={"email": email})
+        assert res.status_code == 503
+        assert "Email delivery service is currently unavailable" in res.json()["detail"]
+    finally:
+        settings.ENVIRONMENT = orig_env
+        settings.SMTP_HOST = orig_host
+        settings.EMAIL_PROVIDER = orig_prov
+
+
 def test_password_reset_token_never_leaked_in_production(client):
-    # Set ENVIRONMENT to production
+    """Verify that even when email delivery succeeds in production, tokens are never exposed in API responses."""
     orig_env = settings.ENVIRONMENT
     settings.ENVIRONMENT = "production"
 
     email = "asuka@nerv.de"
     client.post("/api/v1/auth/register", json={"email": email, "password": "Password123!"})
 
-    try:
-        res = client.post("/api/v1/auth/password-reset/request", json={"email": email})
-        assert res.status_code == 200
-        data = res.json()
-        assert data["message"] == "If an account exists with that email, password reset instructions have been sent."
-        # In production, detail MUST be None - never exposing the reset token!
-        assert data.get("detail") is None
-    finally:
-        settings.ENVIRONMENT = orig_env
+    # Mock EmailService to simulate successful real SMTP dispatch
+    with patch.object(EmailService, "send_password_reset_email", return_value=True):
+        try:
+            res = client.post("/api/v1/auth/password-reset/request", json={"email": email})
+            assert res.status_code == 200
+            data = res.json()
+            assert data["message"] == "If an account exists with that email, password reset instructions have been sent."
+            # In production, detail MUST be None - never exposing the reset token!
+            assert data.get("detail") is None
+        finally:
+            settings.ENVIRONMENT = orig_env
+
+
+def test_password_reset_single_use_and_session_revocation(client):
+    """Verify single-use token consumption and active session revocation upon password reset."""
+    email = "revocation_user@kage.internal"
+    old_pwd = "OldPassword123!"
+    new_pwd = "NewSecurePassword456!"
+
+    client.post("/api/v1/auth/register", json={"email": email, "password": old_pwd})
+
+    # User logs in and establishes active session
+    login_res = client.post("/api/v1/auth/login", json={"email": email, "password": old_pwd})
+    session_token = login_res.cookies[settings.SESSION_COOKIE_NAME]
+
+    # Verify session is valid
+    me_res = client.get("/api/v1/auth/me", cookies={settings.SESSION_COOKIE_NAME: session_token})
+    assert me_res.status_code == 200
+
+    # Request password reset
+    csrf_token = client.cookies.get(settings.CSRF_COOKIE_NAME, "")
+    req_res = client.post(
+        "/api/v1/auth/password-reset/request",
+        json={"email": email},
+        headers={"X-CSRF-Token": csrf_token} if csrf_token else {}
+    )
+    assert req_res.status_code == 200
+    token = req_res.json()["detail"].replace("Dev reset token: ", "").strip()
+
+    # Confirm password reset with single-use token
+    confirm_res = client.post("/api/v1/auth/password-reset/confirm", json={
+        "token": token,
+        "new_password": new_pwd
+    }, headers={"X-CSRF-Token": csrf_token} if csrf_token else {})
+    assert confirm_res.status_code == 200
+
+    # 1. Attempting to REUSE the single-use token MUST fail with 400 Bad Request
+    reuse_res = client.post("/api/v1/auth/password-reset/confirm", json={
+        "token": token,
+        "new_password": "AnotherPassword789!"
+    }, headers={"X-CSRF-Token": csrf_token} if csrf_token else {})
+    assert reuse_res.status_code == 400
+    assert "Invalid or expired password reset token" in reuse_res.json()["detail"]
+
+    # 2. Existing active session MUST be revoked
+    stale_me_res = client.get("/api/v1/auth/me", cookies={settings.SESSION_COOKIE_NAME: session_token})
+    assert stale_me_res.status_code == 401
+
+    # 3. Old password fails, new password succeeds (clear cookies to simulate fresh unauthenticated login)
+    client.cookies.clear()
+    fail_res = client.post("/api/v1/auth/login", json={"email": email, "password": old_pwd})
+    assert fail_res.status_code == 401
+
+    ok_res = client.post("/api/v1/auth/login", json={"email": email, "password": new_pwd})
+    assert ok_res.status_code == 200

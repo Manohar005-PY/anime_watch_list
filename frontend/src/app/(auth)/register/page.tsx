@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { AppHeader } from "@/components/layout/AppHeader";
-import { AnimeQuoteCard } from "@/components/ui/AnimeQuoteCard";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -78,25 +77,30 @@ export default function RegisterPage() {
             </div>
 
             <div className="relative z-10 my-auto py-8">
-              <AnimeQuoteCard variant="panel" />
-
-              <div className="mt-6 space-y-2.5 font-mono text-xs sm:text-sm text-neutral-400">
-                <div className="flex items-center space-x-2">
+              <div className="space-y-3 font-mono text-xs sm:text-sm text-neutral-300 border border-kage-border bg-black/60 p-6 backdrop-blur-xs">
+                <span className="font-mono text-[10px] text-kage-text-muted uppercase tracking-widest block mb-2">
+                  // MEMBERSHIP SPECIFICATIONS //
+                </span>
+                <div className="flex items-center space-x-2.5">
                   <CheckCircle2 className="h-4 w-4 text-white shrink-0" />
                   <span>Completely private watch list</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2.5">
                   <CheckCircle2 className="h-4 w-4 text-white shrink-0" />
                   <span>No ads, trackers, or fake reviews</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2.5">
                   <CheckCircle2 className="h-4 w-4 text-white shrink-0" />
                   <span>Quick 1-click episode progress tracking</span>
+                </div>
+                <div className="flex items-center space-x-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-white shrink-0" />
+                  <span>Instant bulk import and metadata search</span>
                 </div>
               </div>
             </div>
 
-            <div className="relative z-10 border-t border-neutral-800 pt-4 font-mono text-xs text-neutral-500 flex items-center justify-between">
+            <div className="relative z-10 border-t border-neutral-800 pt-4 font-mono text-xs text-neutral-400 flex items-center justify-between">
               <span>FREE & PRIVATE</span>
               <span>KAGE 1.0</span>
             </div>
@@ -117,11 +121,6 @@ export default function RegisterPage() {
                 <div className="flex h-9 w-9 items-center justify-center border border-kage-border text-white text-sm font-mono font-bold">
                   影
                 </div>
-              </div>
-
-              {/* Mobile-Only Quote Showcase */}
-              <div className="block lg:hidden mt-5">
-                <AnimeQuoteCard variant="compact" />
               </div>
 
               {error && (

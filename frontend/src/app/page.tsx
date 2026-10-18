@@ -16,7 +16,6 @@ import { useAuth } from "@/lib/auth-context";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { EditorialShowcaseGallery } from "@/components/landing/EditorialShowcaseGallery";
 import { InteractiveLibraryDemo } from "@/components/landing/InteractiveLibraryDemo";
-import { AnimeQuoteCard } from "@/components/ui/AnimeQuoteCard";
 import { CURATED_CLASSICS } from "@/lib/curated-anime";
 import {
   staggerContainerVariants,
@@ -42,10 +41,19 @@ export default function LandingPage() {
     }
   }, [reduceMotion]);
 
-  // Featured Hero Anime (Verified authentic metadata & covers)
-  const heroPrimary = CURATED_CLASSICS[0]; // Cowboy Bebop
-  const heroSecondary = CURATED_CLASSICS[1]; // Evangelion
-  const heroTertiary = CURATED_CLASSICS[2]; // Ghost in the Shell
+  // Featured Hero Anime with high-speed local assets for sub-1.5s LCP
+  const heroPrimary = {
+    ...CURATED_CLASSICS[0],
+    cover: "/images/hero/cowboy-bebop.png",
+  };
+  const heroSecondary = {
+    ...CURATED_CLASSICS[1],
+    cover: "/images/hero/evangelion.jpg",
+  };
+  const heroTertiary = {
+    ...CURATED_CLASSICS[2],
+    cover: "/images/hero/ghost-in-the-shell.jpg",
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-kage-bg text-kage-text-primary selection:bg-white selection:text-black">
@@ -197,7 +205,10 @@ export default function LandingPage() {
                     <img
                       src={heroSecondary.cover}
                       alt={heroSecondary.title}
+                      width={220}
+                      height={293}
                       loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover filter grayscale contrast-125 transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute top-2 left-2 border border-black/80 bg-black/80 px-1.5 py-0.5 font-mono text-[8px] text-white">
@@ -216,7 +227,10 @@ export default function LandingPage() {
                     <img
                       src={heroTertiary.cover}
                       alt={heroTertiary.title}
+                      width={220}
+                      height={293}
                       loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover filter grayscale contrast-125 transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute bottom-2 right-2 border border-black/80 bg-black/80 px-1.5 py-0.5 font-mono text-[8px] text-white">
@@ -236,8 +250,12 @@ export default function LandingPage() {
                     <img
                       src={heroPrimary.cover}
                       alt="Cowboy Bebop - Primary Archive Specimen"
+                      width={300}
+                      height={400}
                       // @ts-expect-error fetchpriority is a modern HTML attribute supported in Chrome/Safari/Firefox per modern-web-guidance
                       fetchpriority="high"
+                      loading="eager"
+                      decoding="async"
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
 
@@ -365,11 +383,6 @@ export default function LandingPage() {
                   REAL STATS • NO ADS OR TRACKERS
                 </div>
               </div>
-            </div>
-
-            {/* Atmospheric Editorial Anime Quotation Banner */}
-            <div className="mt-14 max-w-2xl mx-auto">
-              <AnimeQuoteCard variant="panel" />
             </div>
           </div>
         </section>

@@ -179,6 +179,22 @@ If you did not request this password reset, please ignore this message. Your exi
 </html>
 """
 
+        # In production, strictly enforce real SMTP configuration - no mock or console fallbacks permitted
+        if settings.ENVIRONMENT == "production":
+            if settings.EMAIL_PROVIDER != "smtp":
+                logger.error(
+                    f"FATAL: Production email provider must be 'smtp' (found '{settings.EMAIL_PROVIDER}'). "
+                    f"Failing safely without dispatching to {cls.mask_email(clean_email)}."
+                )
+                return False
+
+            if not settings.SMTP_HOST or not settings.SMTP_PORT:
+                logger.error(
+                    f"FATAL: Production SMTP_HOST or SMTP_PORT is not configured in Secret Manager / environment. "
+                    f"Failing safely without dispatching to {cls.mask_email(clean_email)}."
+                )
+                return False
+
         # Dispatch based on provider
         if settings.EMAIL_PROVIDER == "mock":
             cls.sent_emails.append({
@@ -217,7 +233,7 @@ If you did not request this password reset, please ignore this message. Your exi
                 return False
 
         else:
-            # Console logger fallback for development / local testing
+            # Console logger fallback strictly for local development / testing
             logger.info(
                 f"[CONSOLE EMAIL] Password reset requested for {cls.mask_email(clean_email)}. "
                 f"Link generated (token hidden for security)."

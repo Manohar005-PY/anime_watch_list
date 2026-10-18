@@ -44,11 +44,22 @@ class Settings(BaseSettings):
     SCHEDULER_SECRET_TOKEN: str = "dev-scheduler-secret-token-change-in-production"
     METADATA_REFRESH_BATCH_SIZE: int = 50
 
-    # Database & Connection Pool Sizing (Cloud Run Scaled)
+    # Documented Cloud SQL Connection Budget Calculation:
+    # Cloud SQL Tier (db-custom-1-3840, 3.75GB RAM) PostgreSQL max_connections = 100
+    # Reserve for PostgreSQL superuser & replication: 5 connections
+    # Reserve for DBA / psql / Cloud SQL Auth proxy monitoring: 10 connections
+    # Reserve for Cloud Run Jobs (Alembic release migrations & metadata refresh cron): 10 connections
+    # Net available for Cloud Run Web Service = 75 connections max.
+    # Cloud Run Web Service configuration:
+    # - 1 uvicorn worker process per container (concurrency handled by Cloud Run)
+    # - Cloud Run autoscaling maxScale: 6 instances (max 8 in rolling deploy bursts)
+    # - Pool size per instance: 4 steady-state + 4 overflow = 8 connections max per container.
+    # - Total peak web pool = 6 instances * 8 connections = 48 connections (well under 75 ceiling).
+    # - Headroom remaining: 75 - 48 = 27 connections (36% buffer).
     DATABASE_URL: str = "postgresql://kage:kage_dev_secret@localhost:5432/kage_db"
-    DB_POOL_SIZE: int = 5
-    DB_MAX_OVERFLOW: int = 5
-    DB_POOL_TIMEOUT: int = 30
+    DB_POOL_SIZE: int = 4
+    DB_MAX_OVERFLOW: int = 4
+    DB_POOL_TIMEOUT: int = 15
     DB_POOL_RECYCLE: int = 1800
 
     # CORS

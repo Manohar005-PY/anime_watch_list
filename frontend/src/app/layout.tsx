@@ -22,6 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        {/* Preload primary above-the-fold hero artwork for sub-1.5s LCP per web.dev guidelines */}
+        <link rel="preload" as="image" href="/images/hero/cowboy-bebop.png" fetchPriority="high" />
+      </head>
       <body className="cinematic-grain min-h-screen bg-kage-bg text-kage-text-primary antialiased selection:bg-white selection:text-black">
         <AuthProvider>{children}</AuthProvider>
       </body>

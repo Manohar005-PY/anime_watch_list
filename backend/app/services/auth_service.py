@@ -9,6 +9,7 @@ from app.core.security import (
     verify_password,
     generate_session_token,
     hash_token,
+    generate_csrf_token,
     login_rate_limiter,
     register_rate_limiter,
     reset_pwd_rate_limiter
@@ -110,12 +111,24 @@ class AuthService:
         db.add(session_obj)
         db.commit()
 
-        # Set secure HttpOnly cookie
+        # Set secure HttpOnly session cookie
         response.set_cookie(
             key=settings.SESSION_COOKIE_NAME,
             value=raw_token,
             max_age=settings.SESSION_MAX_AGE_SECONDS,
             httponly=settings.SESSION_COOKIE_HTTPONLY,
+            secure=settings.SESSION_COOKIE_SECURE,
+            samesite=settings.SESSION_COOKIE_SAMESITE,
+            path="/"
+        )
+
+        # Issue signed, session-bound CSRF token bound to this authenticated session
+        csrf_token = generate_csrf_token(session_token=raw_token)
+        response.set_cookie(
+            key=settings.CSRF_COOKIE_NAME,
+            value=csrf_token,
+            max_age=settings.SESSION_MAX_AGE_SECONDS,
+            httponly=False,
             secure=settings.SESSION_COOKIE_SECURE,
             samesite=settings.SESSION_COOKIE_SAMESITE,
             path="/"
@@ -150,7 +163,7 @@ class AuthService:
 
     @staticmethod
     def logout_user(db: Session, token: Optional[str], response: Response) -> None:
-        """Invalidate session in database and delete cookie."""
+        """Invalidate session in database and delete cookies."""
         if token:
             token_hash = hash_token(token)
             db.query(SessionModel).filter(SessionModel.session_token_hash == token_hash).delete()
@@ -160,6 +173,12 @@ class AuthService:
             key=settings.SESSION_COOKIE_NAME,
             path="/",
             httponly=settings.SESSION_COOKIE_HTTPONLY,
+            secure=settings.SESSION_COOKIE_SECURE,
+            samesite=settings.SESSION_COOKIE_SAMESITE
+        )
+        response.delete_cookie(
+            key=settings.CSRF_COOKIE_NAME,
+            path="/",
             secure=settings.SESSION_COOKIE_SECURE,
             samesite=settings.SESSION_COOKIE_SAMESITE
         )
@@ -195,11 +214,18 @@ class AuthService:
             db.commit()
 
             # Dispatch transactional email (logs never contain raw token)
-            EmailService.send_password_reset_email(
+            email_sent = EmailService.send_password_reset_email(
                 to_email=user.email,
                 token=raw_token,
                 display_name=user.display_name
             )
+
+            # In production, fail safely if email delivery infrastructure is unavailable
+            if settings.ENVIRONMENT == "production" and not email_sent:
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Email delivery service is currently unavailable. Please try again later."
+                )
 
         # In dev mode, return token so tests and local UI can test reset
         return raw_token if settings.ENVIRONMENT != "production" else None
