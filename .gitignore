@@ -23,6 +23,10 @@ wheels/
 venv/
 ENV/
 env/
+# Databases
+*.db
+*.sqlite
+*.sqlite3
 
 # Node
 node_modules/

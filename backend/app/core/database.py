@@ -3,18 +3,29 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from app.core.config import settings
 
+# Normalize postgres URL to support both psycopg v3 and psycopg2 seamlessly
+database_url = settings.DATABASE_URL
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+if database_url.startswith("postgresql://") and "+psycopg" not in database_url:
+    try:
+        import psycopg  # noqa: F401
+    except ImportError:
+        database_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
 # Engine configuration with connection pooling
 connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
+if database_url.startswith("sqlite"):
     connect_args["check_same_thread"] = False
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    database_url,
     pool_pre_ping=True,
     connect_args=connect_args,
     # Sensible pool size for Cloud Run horizontal scaling
-    pool_size=10 if not settings.DATABASE_URL.startswith("sqlite") else 5,
-    max_overflow=20 if not settings.DATABASE_URL.startswith("sqlite") else 10,
+    pool_size=10 if not database_url.startswith("sqlite") else 5,
+    max_overflow=20 if not database_url.startswith("sqlite") else 10,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
