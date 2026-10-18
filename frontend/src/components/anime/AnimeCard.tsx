@@ -28,30 +28,30 @@ export function AnimeCard({
   const getStatusIcon = (status: AnimeStatus) => {
     switch (status) {
       case "COMPLETED":
-        return <CheckCircle2 className="h-3 w-3" />;
+        return <CheckCircle2 className="h-3 w-3 text-white" />;
       case "WATCHING":
-        return <Film className="h-3 w-3" />;
+        return <Film className="h-3 w-3 text-white" />;
       case "PLANNED":
-        return <Clock className="h-3 w-3" />;
+        return <Clock className="h-3 w-3 text-neutral-400" />;
       case "PAUSED":
-        return <PauseCircle className="h-3 w-3" />;
+        return <PauseCircle className="h-3 w-3 text-neutral-400" />;
       case "DROPPED":
-        return <XCircle className="h-3 w-3" />;
+        return <XCircle className="h-3 w-3 text-neutral-400" />;
     }
   };
 
   const getStatusLabel = (status: AnimeStatus) => {
     switch (status) {
       case "WATCHING":
-        return "Watching";
+        return "Watching // 鑑賞中";
       case "COMPLETED":
-        return "Completed";
+        return "Completed // 完了";
       case "PLANNED":
-        return "Planned";
+        return "Planned // 予定";
       case "PAUSED":
-        return "Paused";
+        return "Paused // 中断";
       case "DROPPED":
-        return "Dropped";
+        return "Dropped // 中止";
     }
   };
 
@@ -77,66 +77,90 @@ export function AnimeCard({
     ? Math.min(100, Math.round((anime.watched_episodes / anime.total_episodes) * 100))
     : 0;
 
+  // List View: Editorial Horizontal Strip
   if (viewMode === "list") {
     return (
       <div
         onClick={() => onSelect(anime)}
-        className="group flex cursor-pointer items-center justify-between border border-kage-border bg-kage-surface px-4 py-3 transition-colors hover:border-kage-border-focus hover:bg-kage-surface-raised"
+        className="group flex cursor-pointer items-center justify-between border border-kage-border bg-kage-surface px-4 py-3 transition-all hover:border-white hover:bg-kage-surface-raised shadow-tactile"
       >
         <div className="flex items-center space-x-4 min-w-0 flex-1">
-          {/* Status icon */}
-          <span className="flex items-center space-x-1.5 border border-kage-border px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-kage-text-secondary">
-            {getStatusIcon(anime.status)}
-            <span>{getStatusLabel(anime.status)}</span>
-          </span>
+          {/* Miniature Poster Thumbnail */}
+          <div className="relative h-12 w-9 flex-none overflow-hidden border border-kage-border bg-black">
+            {anime.poster_url && !imgError ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={anime.poster_url}
+                alt={anime.title}
+                onError={() => setImgError(true)}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center font-mono text-[9px] text-neutral-600">
+                影
+              </div>
+            )}
+          </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-xs font-semibold tracking-wide text-kage-text-primary group-hover:underline">
-              {anime.title}
-            </h3>
+            <div className="flex items-center space-x-2">
+              <span className="flex items-center space-x-1 border border-kage-border px-1.5 py-0.5 text-[9px] font-mono uppercase text-kage-text-secondary">
+                {getStatusIcon(anime.status)}
+                <span>{anime.status}</span>
+              </span>
+              <h3 className="truncate text-xs sm:text-sm font-bold text-white group-hover:underline">
+                {anime.title}
+              </h3>
+            </div>
             {anime.alternate_title && (
-              <p className="truncate text-[10px] text-kage-text-muted">{anime.alternate_title}</p>
+              <p className="truncate text-[10px] text-kage-text-muted mt-0.5">
+                {anime.alternate_title}
+              </p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center space-x-6 pl-4">
-          {/* Episode progress */}
+        <div className="flex items-center space-x-4 sm:space-x-6 pl-4">
+          {/* Episode Progress Stepper */}
           <div className="flex items-center space-x-2 font-mono text-xs">
-            <span className="text-kage-text-primary">{anime.watched_episodes}</span>
+            <span className="text-white font-bold">{anime.watched_episodes}</span>
             <span className="text-kage-text-muted">/</span>
             <span className="text-kage-text-muted">
               {anime.total_episodes ? anime.total_episodes : "—"}
             </span>
+            <span className="hidden sm:inline text-kage-text-muted text-[10px]">
+              ({progressPercent}%)
+            </span>
           </div>
 
-          {/* Rating */}
-          <div className="hidden sm:flex items-center space-x-1 font-mono text-xs text-kage-text-secondary">
-            <Star className={`h-3 w-3 ${anime.rating ? "fill-white text-white" : "text-kage-text-muted"}`} />
-            <span>{anime.rating ? `${anime.rating}/10` : "—"}</span>
-          </div>
-
-          {/* Quick Increment button */}
+          {/* Quick Increment (+1) */}
           {(!anime.total_episodes || anime.watched_episodes < anime.total_episodes) && (
             <button
               onClick={handleIncrement}
               disabled={isIncrementing}
-              title="Increment watched episode (+1)"
-              className="border border-kage-border p-1 text-kage-text-muted transition-colors hover:border-kage-text-primary hover:text-kage-text-primary"
+              aria-label={`Increment ${anime.title} watched count`}
+              className="border border-kage-border bg-kage-surface-raised p-1.5 text-white hover:border-white hover:bg-white hover:text-black transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
           )}
 
-          {/* Favorite toggle */}
+          {/* Rating */}
+          <div className="hidden sm:flex items-center space-x-1 font-mono text-xs text-white">
+            <Star className={`h-3.5 w-3.5 ${anime.rating ? "fill-white text-white" : "text-neutral-700"}`} />
+            <span>{anime.rating ? `${anime.rating}/10` : "—"}</span>
+          </div>
+
+          {/* Favorite Toggle */}
           <button
             onClick={handleFavorite}
-            title={anime.is_favorite ? "Favorited" : "Add to favorites"}
-            className="p-1 text-kage-text-muted transition-colors hover:text-kage-text-primary"
+            aria-label={anime.is_favorite ? "Remove favorite" : "Mark favorite"}
+            className="p-1.5 text-neutral-500 hover:text-white transition-colors"
           >
             <Star
               className={`h-4 w-4 ${
-                anime.is_favorite ? "fill-white text-white" : "text-kage-text-muted hover:text-white"
+                anime.is_favorite ? "fill-white text-white" : "text-neutral-700 hover:text-white"
               }`}
             />
           </button>
@@ -145,96 +169,108 @@ export function AnimeCard({
     );
   }
 
-  // Grid view (tactile manga panel)
+  // Grid View: Tactile Manga Panel with Corner Crosshairs
   return (
     <motion.div
       onClick={() => onSelect(anime)}
-      whileHover={reduceMotion ? {} : { y: -3, scale: 1.01 }}
-      transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-      className="manga-panel group relative flex cursor-pointer flex-col overflow-hidden shadow-tactile"
+      whileHover={reduceMotion ? {} : { y: -4, scale: 1.015 }}
+      transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+      className="manga-panel group relative flex cursor-pointer flex-col overflow-hidden shadow-tactile border border-kage-border hover:border-white transition-all bg-kage-surface"
     >
-      {/* Artwork or designed graphic fallback */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-kage-bg">
+      {/* Artwork or Sophisticated Typographic Fallback */}
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-black">
         {anime.poster_url && !imgError ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={anime.poster_url}
             alt={anime.title}
             onError={() => setImgError(true)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-106"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
-            {/* Procedural manga frame silhouette */}
-            <div className="mb-3 flex h-16 w-16 items-center justify-center border border-kage-border text-kage-border-focus transition-colors group-hover:border-kage-text-secondary">
-              <Film className="h-8 w-8 stroke-[1]" />
+          <div className="relative flex h-full w-full flex-col justify-between p-5 manga-screentone">
+            <div className="flex items-center justify-between font-mono text-[9px] text-neutral-500 border-b border-neutral-800 pb-2">
+              <span>ARCHIVE ENTRY</span>
+              <span>NO ARTWORK</span>
             </div>
-            <span className="font-mono text-[10px] tracking-widest text-kage-text-muted uppercase">
-              No Poster
-            </span>
+            <div className="text-center py-4">
+              <span className="font-mono text-4xl font-extrabold text-neutral-800 tracking-tighter">
+                影
+              </span>
+              <p className="mt-2 text-xs font-bold text-neutral-300 line-clamp-2 px-2">
+                {anime.title}
+              </p>
+            </div>
+            <div className="border-t border-neutral-800 pt-2 font-mono text-[9px] text-neutral-600 flex justify-between">
+              <span>EP: {anime.watched_episodes}</span>
+              <span>{anime.status}</span>
+            </div>
           </div>
         )}
 
         {/* Favorite Icon Badge */}
         <button
           onClick={handleFavorite}
-          title={anime.is_favorite ? "Favorited" : "Favorite"}
-          className="absolute right-2 top-2 z-10 border border-kage-border/80 bg-kage-bg/80 p-1.5 backdrop-blur-sm transition-transform active:scale-90"
+          aria-label={anime.is_favorite ? "Remove favorite" : "Mark favorite"}
+          className="absolute right-2 top-2 z-10 border border-black/80 bg-black/80 p-1.5 backdrop-blur-xs transition-transform active:scale-90"
         >
           <Star
             className={`h-3.5 w-3.5 ${
-              anime.is_favorite ? "fill-white text-white" : "text-kage-text-muted hover:text-white"
+              anime.is_favorite ? "fill-white text-white" : "text-neutral-500 hover:text-white"
             }`}
           />
         </button>
 
         {/* Status Badge */}
-        <div className="absolute left-2 top-2 z-10 flex items-center space-x-1 border border-kage-border/90 bg-kage-bg/90 px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider text-kage-text-secondary backdrop-blur-sm">
+        <div className="absolute left-2 top-2 z-10 flex items-center space-x-1 border border-black/80 bg-black/80 px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider text-white backdrop-blur-xs">
           {getStatusIcon(anime.status)}
-          <span>{getStatusLabel(anime.status)}</span>
+          <span>{anime.status}</span>
         </div>
 
-        {/* Progress bar overlay at bottom of poster */}
+        {/* Progress Bar Overlay at Bottom of Poster */}
         {anime.total_episodes && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-kage-border">
+          <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-neutral-900 border-t border-black">
             <div
-              className="h-full bg-kage-accent"
+              className="h-full bg-white transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
         )}
       </div>
 
-      {/* Metadata card footer */}
-      <div className="flex flex-1 flex-col justify-between p-3.5">
+      {/* Card Content & Metadata */}
+      <div className="flex flex-1 flex-col justify-between p-3.5 bg-kage-surface-raised">
         <div>
-          <h3 className="line-clamp-1 text-xs font-semibold tracking-wide text-kage-text-primary group-hover:underline">
+          <h3 className="line-clamp-1 text-xs sm:text-sm font-bold text-white group-hover:underline">
             {anime.title}
           </h3>
           {anime.alternate_title && (
-            <p className="line-clamp-1 text-[10px] text-kage-text-muted">{anime.alternate_title}</p>
+            <p className="line-clamp-1 font-mono text-[10px] text-kage-text-muted mt-0.5">
+              {anime.alternate_title}
+            </p>
           )}
         </div>
 
-        <div className="mt-3 flex items-center justify-between border-t border-kage-border/80 pt-2 font-mono text-[11px]">
-          {/* Episodes count */}
+        {/* Action Controls & Metric Strip */}
+        <div className="mt-3.5 flex items-center justify-between border-t border-kage-border/80 pt-2 font-mono text-[11px]">
+          {/* Episode Counter */}
           <div className="flex items-center space-x-1 text-kage-text-secondary">
             <span>EP</span>
-            <span className="text-kage-text-primary font-bold">{anime.watched_episodes}</span>
-            <span className="text-kage-text-muted">/</span>
-            <span className="text-kage-text-muted">
+            <span className="text-white font-bold">{anime.watched_episodes}</span>
+            <span className="text-neutral-500">/</span>
+            <span className="text-neutral-400">
               {anime.total_episodes ? anime.total_episodes : "—"}
             </span>
           </div>
 
-          {/* Quick Increment button */}
+          {/* Quick Increment (+1) Button */}
           {(!anime.total_episodes || anime.watched_episodes < anime.total_episodes) && (
             <button
               onClick={handleIncrement}
               disabled={isIncrementing}
-              title="Add 1 episode"
-              className="flex items-center space-x-1 border border-kage-border px-2 py-0.5 text-[10px] text-kage-text-muted transition-colors hover:border-kage-text-primary hover:text-kage-text-primary"
+              aria-label={`Increment ${anime.title} episode count`}
+              className="flex items-center space-x-1 border border-kage-border bg-black px-2 py-0.5 text-[10px] font-bold text-white transition-colors hover:border-white hover:bg-white hover:text-black"
             >
               <Plus className="h-3 w-3" />
               <span>1</span>
@@ -242,11 +278,13 @@ export function AnimeCard({
           )}
 
           {/* Rating */}
-          {anime.rating && (
-            <div className="flex items-center space-x-1 text-kage-text-primary">
+          {anime.rating ? (
+            <div className="flex items-center space-x-1 text-white">
               <Star className="h-3 w-3 fill-white text-white" />
               <span>{anime.rating}</span>
             </div>
+          ) : (
+            <span className="text-neutral-600 text-[10px]">—</span>
           )}
         </div>
       </div>

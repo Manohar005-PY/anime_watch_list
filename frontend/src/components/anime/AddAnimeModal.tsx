@@ -6,6 +6,8 @@ import { X, Plus, AlertCircle, Film } from "lucide-react";
 import { AnimeEntry, AnimeStatus, animeApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
+import { CURATED_CLASSICS, CuratedAnime } from "@/lib/curated-anime";
+
 interface AddAnimeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -27,6 +29,15 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleQuickFill = (preset: CuratedAnime) => {
+    setTitle(preset.title);
+    setAlternateTitle(preset.native);
+    setPosterUrl(preset.cover);
+    setTotalEpisodes(preset.episodes.toString());
+    setGenresText(preset.genres.join(", "));
+    setRating(Math.round(preset.score / 10).toString());
+  };
 
   const resetForm = () => {
     setTitle("");
@@ -130,6 +141,25 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
             >
               <X className="h-4 w-4" />
             </button>
+          </div>
+
+          {/* Quick Fill Preset Strip */}
+          <div className="mt-3.5 border-b border-kage-border pb-3">
+            <span className="block font-mono text-[9px] uppercase tracking-wider text-kage-text-muted mb-1.5">
+              QUICK FILL FROM ARCHIVAL CANON:
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {CURATED_CLASSICS.slice(0, 6).map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => handleQuickFill(c)}
+                  className="border border-kage-border bg-kage-bg px-2 py-0.5 font-mono text-[10px] text-kage-text-secondary hover:border-white hover:text-white transition-colors"
+                >
+                  + {c.title}
+                </button>
+              ))}
+            </div>
           </div>
 
           {error && (
