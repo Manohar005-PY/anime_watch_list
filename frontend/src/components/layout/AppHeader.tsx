@@ -15,14 +15,16 @@ import {
   X,
   Eye,
   Sliders,
+  UploadCloud,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 interface AppHeaderProps {
   onOpenAddModal?: () => void;
+  onOpenImportModal?: () => void;
 }
 
-export function AppHeader({ onOpenAddModal }: AppHeaderProps) {
+export function AppHeader({ onOpenAddModal, onOpenImportModal }: AppHeaderProps) {
   const pathname = usePathname();
   const { user, logout, reduceMotion, updatePreferences } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,7 +32,8 @@ export function AppHeader({ onOpenAddModal }: AppHeaderProps) {
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: Compass },
     { name: "Collection", href: "/collection", icon: Film },
-    { name: "Statistics", href: "/stats", icon: BarChart3 },
+    { name: "Import", href: "/import", icon: UploadCloud },
+    { name: "Stats", href: "/stats", icon: BarChart3 },
     { name: "Settings", href: "/settings", icon: SettingsIcon },
   ];
 
@@ -106,8 +109,19 @@ export function AppHeader({ onOpenAddModal }: AppHeaderProps) {
                 aria-label="Toggle reduced motion preference"
               >
                 <Sliders className="h-3 w-3" />
-                <span>{reduceMotion ? "MOTION: OFF" : "MOTION: ON"}</span>
+                <span>{reduceMotion ? "Motion: Off" : "Motion: On"}</span>
               </button>
+
+              {/* Import Anime Quick Action */}
+              {onOpenImportModal && (
+                <button
+                  onClick={onOpenImportModal}
+                  className="hidden sm:flex items-center space-x-1.5 border border-kage-border bg-kage-surface px-3 py-1.5 text-xs font-medium tracking-wider text-kage-text-primary transition-colors hover:border-white active:scale-95"
+                >
+                  <UploadCloud className="h-3.5 w-3.5" />
+                  <span>Import</span>
+                </button>
+              )}
 
               {/* Add Anime Quick Action */}
               {onOpenAddModal && (
@@ -116,7 +130,7 @@ export function AppHeader({ onOpenAddModal }: AppHeaderProps) {
                   className="flex items-center space-x-1.5 border border-kage-text-primary bg-kage-text-primary px-3 py-1.5 text-xs font-medium tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95"
                 >
                   <Plus className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Add Title</span>
+                  <span className="hidden sm:inline">Add Anime</span>
                 </button>
               )}
 
@@ -156,7 +170,7 @@ export function AppHeader({ onOpenAddModal }: AppHeaderProps) {
                 href="/register"
                 className="border border-kage-text-primary bg-kage-text-primary px-3 py-1.5 text-xs font-medium tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95"
               >
-                Join Library
+                Sign Up
               </Link>
             </div>
           )}

@@ -131,7 +131,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                 +
               </span>
               <h2 className="text-sm font-semibold tracking-wider text-kage-text-primary uppercase">
-                Add Anime to Library
+                Add Anime to My List
               </h2>
             </div>
             <button
@@ -146,7 +146,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
           {/* Quick Fill Preset Strip */}
           <div className="mt-3.5 border-b border-kage-border pb-3">
             <span className="block font-mono text-[9px] uppercase tracking-wider text-kage-text-muted mb-1.5">
-              QUICK FILL FROM ARCHIVAL CANON:
+              QUICK ADD POPULAR CLASSICS:
             </span>
             <div className="flex flex-wrap gap-1.5">
               {CURATED_CLASSICS.slice(0, 6).map((c) => (
@@ -203,7 +203,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
-                  Watch Status
+                  Status
                 </label>
                 <select
                   value={status}
@@ -213,7 +213,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                   <option value="WATCHING">Watching</option>
                   <option value="COMPLETED">Completed</option>
                   <option value="PLANNED">Plan to Watch</option>
-                  <option value="PAUSED">Paused</option>
+                  <option value="PAUSED">On Hold</option>
                   <option value="DROPPED">Dropped</option>
                 </select>
               </div>
@@ -270,7 +270,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
             {/* Poster URL (HTTPS required, client-safe) */}
             <div>
               <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
-                Poster Image URL (https only)
+                Poster Image URL
               </label>
               <input
                 type="url"
@@ -298,13 +298,13 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
             {/* Notes */}
             <div>
               <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
-                Personal Notes & Impressions
+                My Notes
               </label>
               <textarea
                 rows={3}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Key themes, favourite episodes, director notes..."
+                placeholder="Thoughts, favorite episodes, or notes..."
                 className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none resize-none"
               />
             </div>
@@ -319,7 +319,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                 className="h-4 w-4 rounded border-kage-border bg-kage-bg text-white focus:ring-0"
               />
               <label htmlFor="isFavorite" className="text-xs text-kage-text-secondary select-none cursor-pointer">
-                Mark as personal favorite ★
+                Add to favorites ★
               </label>
             </div>
 
@@ -337,7 +337,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                 disabled={loading}
                 className="border border-kage-text-primary bg-kage-text-primary px-5 py-2 text-xs font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95 disabled:opacity-50"
               >
-                {loading ? "Adding..." : "Add to Library"}
+                {loading ? "Adding..." : "Add to My List"}
               </button>
             </div>
           </form>

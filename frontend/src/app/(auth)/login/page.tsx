@@ -60,7 +60,7 @@ export default function LoginPage() {
                 <span className="tracking-widest text-white font-bold">KAGE</span>
               </div>
               <p className="mt-2 text-[10px] text-neutral-400">
-                GATE // 01 • ACCESS CONTROL
+                WELCOME BACK
               </p>
             </div>
 
@@ -69,7 +69,7 @@ export default function LoginPage() {
                 // 認証 //
               </span>
               <h2 className="text-2xl font-extrabold text-white uppercase tracking-tight mt-2">
-                Return to your collection.
+                Welcome back to your anime list.
               </h2>
               <p className="mt-4 text-xs text-neutral-300 italic font-mono leading-relaxed">
                 &ldquo;Close the world, open the nExt.&rdquo;
@@ -77,7 +77,7 @@ export default function LoginPage() {
             </div>
 
             <div className="relative z-10 border-t border-neutral-800 pt-4 font-mono text-[10px] text-neutral-500 flex items-center justify-between">
-              <span>ARGON2ID • SECURE HTTP-ONLY</span>
+              <span>SECURE LOGIN</span>
               <span>24 FPS</span>
             </div>
           </div>
@@ -88,10 +88,10 @@ export default function LoginPage() {
               <div className="flex items-center justify-between border-b border-kage-border pb-4">
                 <div>
                   <span className="font-mono text-[10px] tracking-widest text-kage-text-muted uppercase">
-                    USER AUTHENTICATION
+                    SIGN IN
                   </span>
                   <h1 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-white uppercase">
-                    Enter Archive
+                    Log In
                   </h1>
                 </div>
                 <div className="flex h-8 w-8 items-center justify-center border border-kage-border text-white text-xs font-mono">
@@ -112,7 +112,7 @@ export default function LoginPage() {
                     htmlFor="email"
                     className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary"
                   >
-                    Account Email
+                    Email
                   </label>
                   <input
                     id="email"
@@ -121,7 +121,7 @@ export default function LoginPage() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="curator@kage.app"
+                    placeholder="you@example.com"
                     className="mt-1.5 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-xs text-kage-text-primary placeholder:text-neutral-600 focus:border-white focus:outline-none transition-colors"
                   />
                 </div>
@@ -167,7 +167,7 @@ export default function LoginPage() {
                   disabled={loading}
                   className="flex w-full items-center justify-center space-x-2 border border-white bg-white py-3 text-xs sm:text-sm font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-98 disabled:opacity-50 shadow-tactile mt-2"
                 >
-                  <span>{loading ? "AUTHENTICATING..." : "SIGN IN TO ARCHIVE"}</span>
+                  <span>{loading ? "LOGGING IN..." : "LOG IN"}</span>
                   {!loading && <ArrowRight className="h-4 w-4" />}
                 </button>
               </form>
@@ -175,12 +175,12 @@ export default function LoginPage() {
 
             <div className="mt-8 border-t border-kage-border pt-4 text-center">
               <p className="font-mono text-xs text-kage-text-muted">
-                New curator?{" "}
+                Don&apos;t have an account?{" "}
                 <Link
                   href="/register"
                   className="text-white font-bold underline underline-offset-4 hover:text-neutral-300"
                 >
-                  Create your personal library
+                  Sign up here
                 </Link>
               </p>
             </div>

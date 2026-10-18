@@ -13,13 +13,13 @@ export function StatsCharts({ stats }: StatsChartsProps) {
   const maxRatingCount = Math.max(1, ...Object.values(stats.ratings_distribution || {}));
 
   const metrics = [
-    { label: "TOTAL TITLES", value: stats.total_titles, icon: Film },
+    { label: "TOTAL SHOWS", value: stats.total_titles, icon: Film },
     { label: "CURRENTLY WATCHING", value: stats.watching_count, icon: Film },
     { label: "COMPLETED", value: stats.completed_count, icon: CheckCircle2 },
     { label: "PLAN TO WATCH", value: stats.planned_count, icon: Clock },
     { label: "TOTAL EPISODES", value: stats.total_episodes_watched, icon: Tv },
     {
-      label: "MEAN RATING",
+      label: "AVG RATING",
       value: stats.mean_rating ? `${stats.mean_rating}/10` : "—",
       icon: Star,
     },
@@ -54,13 +54,13 @@ export function StatsCharts({ stats }: StatsChartsProps) {
         <div className="border border-kage-border bg-kage-surface p-6 flex flex-col justify-between">
           <div>
             <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-              LIBRARY COMPLETION
+              COMPLETION RATE
             </span>
             <h3 className="text-sm font-semibold tracking-wide text-kage-text-primary mt-1">
-              Overall Progress Rate
+              How much you&apos;ve completed
             </h3>
             <p className="mt-1 text-xs text-kage-text-muted">
-              Percentage of tracked anime marked as completed.
+              Percentage of shows on your list marked as completed.
             </p>
           </div>
 
@@ -71,7 +71,7 @@ export function StatsCharts({ stats }: StatsChartsProps) {
           <div className="border-t border-kage-border/80 pt-3 text-center font-mono text-xs text-kage-text-secondary">
             <span>{stats.completed_count} completed</span>
             <span className="mx-2 text-kage-text-muted">/</span>
-            <span>{stats.total_titles} total titles</span>
+            <span>{stats.total_titles} total shows</span>
           </div>
         </div>
 
@@ -79,10 +79,10 @@ export function StatsCharts({ stats }: StatsChartsProps) {
         <div className="border border-kage-border bg-kage-surface p-6 lg:col-span-2 flex flex-col justify-between">
           <div>
             <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-              STATUS BREAKDOWN
+              SHOW STATUSES
             </span>
             <h3 className="text-sm font-semibold tracking-wide text-kage-text-primary mt-1">
-              Collection Watch Statuses
+              Where your shows stand
             </h3>
           </div>
 
@@ -105,7 +105,7 @@ export function StatsCharts({ stats }: StatsChartsProps) {
                 color: "bg-neutral-600",
               },
               {
-                label: "Paused",
+                label: "On Hold",
                 count: stats.paused_count,
                 color: "bg-neutral-700",
               },
@@ -136,7 +136,7 @@ export function StatsCharts({ stats }: StatsChartsProps) {
           </div>
 
           <p className="font-mono text-[10px] text-kage-text-muted border-t border-kage-border/80 pt-3">
-            All counts computed directly from your current persistent database records.
+            Updated automatically from your list.
           </p>
         </div>
       </div>
@@ -146,10 +146,10 @@ export function StatsCharts({ stats }: StatsChartsProps) {
         {/* Ratings Bar Chart (1-10) */}
         <div className="border border-kage-border bg-kage-surface p-6 lg:col-span-2">
           <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-            RATINGS DISTRIBUTION
+            RATINGS BREAKDOWN
           </span>
           <h3 className="text-sm font-semibold tracking-wide text-kage-text-primary mt-1">
-            Personal Score Curve (1 to 10)
+            How you rate shows (1 to 10)
           </h3>
 
           <div className="mt-8 flex h-48 items-end justify-between gap-2 border-b border-kage-border pb-2 px-2">
@@ -176,7 +176,7 @@ export function StatsCharts({ stats }: StatsChartsProps) {
           </div>
 
           <div className="mt-4 flex justify-between font-mono text-[10px] text-kage-text-muted">
-            <span>1 = Disaster</span>
+            <span>1 = Awful</span>
             <span>10 = Masterpiece</span>
           </div>
         </div>
@@ -184,10 +184,10 @@ export function StatsCharts({ stats }: StatsChartsProps) {
         {/* Top Genres Breakdown */}
         <div className="border border-kage-border bg-kage-surface p-6">
           <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-            GENRES
+            TOP GENRES
           </span>
           <h3 className="text-sm font-semibold tracking-wide text-kage-text-primary mt-1">
-            Top Tags in Library
+            Your Favorite Genres
           </h3>
 
           <div className="mt-6 flex flex-wrap gap-2">
@@ -205,7 +205,7 @@ export function StatsCharts({ stats }: StatsChartsProps) {
               ))
             ) : (
               <p className="text-xs text-kage-text-muted italic">
-                No genre tags recorded yet. Add tags when adding anime titles.
+                No genres recorded yet. Add genres when adding shows.
               </p>
             )}
           </div>

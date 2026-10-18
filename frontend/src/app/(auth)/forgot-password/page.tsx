@@ -41,10 +41,10 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-md border border-kage-border bg-kage-surface p-8 shadow-2xl">
           <div className="border-b border-kage-border pb-4 text-center">
             <span className="font-mono text-xs tracking-widest text-kage-text-muted uppercase">
-              ACCOUNT RECOVERY
+              PASSWORD RESET
             </span>
             <h1 className="mt-1 text-xl font-bold tracking-tight text-white uppercase">
-              Reset Password
+              Forgot Password
             </h1>
           </div>
 
@@ -60,8 +60,7 @@ export default function ForgotPasswordPage() {
               <div className="flex items-start space-x-2 border border-kage-border bg-kage-bg p-4 text-xs text-kage-text-secondary">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-white mt-0.5" />
                 <span>
-                  If an account exists with that email address, password reset instructions have been
-                  generated. Check your messages or proceed to the reset screen.
+                  If an account matches that email address, reset instructions were generated.
                 </span>
               </div>
 
@@ -78,14 +77,13 @@ export default function ForgotPasswordPage() {
                 href={`/reset-password${devToken ? `?token=${encodeURIComponent(devToken)}` : ""}`}
                 className="block w-full border border-kage-text-primary bg-kage-text-primary py-2.5 text-center text-xs font-semibold tracking-wider text-kage-bg hover:opacity-90 transition-opacity"
               >
-                Proceed to Enter New Password
+                Choose New Password
               </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <p className="text-xs text-kage-text-muted leading-relaxed">
-                Enter your registered email address. We will create a single-use, 30-minute secure
-                reset token.
+                Enter your email address to reset your password.
               </p>
 
               <div>
@@ -111,7 +109,7 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
                 className="mt-2 w-full border border-kage-text-primary bg-kage-text-primary py-2.5 text-xs font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95 disabled:opacity-50"
               >
-                {loading ? "Sending Request..." : "Request Reset Instructions"}
+                {loading ? "Sending..." : "Send Reset Link"}
               </button>
             </form>
           )}

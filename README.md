@@ -120,15 +120,52 @@ cd backend
 pytest -v
 ```
 
-### Automated Test Coverage
+### Automated Test Coverage (30 Unit & Integration Tests)
 - `test_auth.py`: Registration, duplicate email rejection, Argon2id verification, session cookie issuance, password reset single-use token lifecycle, and session invalidation.
 - `test_anime.py`: CRUD operations, episode tracking boundaries (`watched <= total`), automatic completion transitions, favorite toggling, and multi-field filtering.
 - `test_security_isolation.py`: Explicit IDOR tests proving User A cannot read, edit, delete, or aggregate User B's entries, independent tracking of identical titles across users, and SSRF poster URL blocking.
 - `test_account.py`: Preference updates, complete JSON data export, and cascading account deletion.
+- `test_import.py`: Plain text and CSV parsing, season disambiguation (S1 vs S2), movie vs TV format penalties, mock metadata enrichment, duplicate detection, candidate overrides, and IDOR isolation.
+- `test_metadata_refresh.py`: Single anime episode update, non-destructive conflict preservation (`watched > total`), Cloud Scheduler `X-Scheduler-Token` security guard, and SSRF URL protection.
 
 ---
 
-## 6. Motion Design System & Tokens
+## 6. Smart Bulk Import & Automatic Metadata Discovery
+
+KAGE includes a bulk import and discovery wizard:
+
+- **Supported Input**:
+  - Multiline text paste (one title per line).
+  - TXT file upload.
+  - CSV file upload with smart header recognition (`title`, `status`, `watched_episodes`, `rating`, `notes`).
+- **Open Metadata Provider (Kitsu JSON:API)**:
+  - Connects to open registries (`https://kitsu.io/api/edge/anime`) without AniList Terms of Use restrictions on tracking applications.
+  - Sub-second responses, normalized titles, and verified canonical poster images.
+- **Disambiguation Engine**:
+  - Normalizes Unicode NFKD and calculates sequence similarity ratios.
+  - Extracts season indices and applies penalties for season mismatches (e.g. *Attack on Titan* vs *Attack on Titan Season 2*).
+  - Surfaces ambiguous matches for user confirmation with candidate alternatives.
+- **Duplicate Handling**:
+  - Flags duplicate titles against the user's existing personal archive.
+  - User options per duplicate: `Skip item`, `Update missing metadata only`, or `Merge progress`.
+
+---
+
+## 7. Scheduled Metadata Refresh & Non-Destructive Conflict Resolution
+
+- **Scheduled Batch Refresh**:
+  - `POST /api/v1/metadata/refresh/batch?limit=50` periodically updates episode counts for ongoing series (`WATCHING`, `PLANNED`, `PAUSED`).
+  - Guarded by the secret header `X-Scheduler-Token`.
+  - Configurable via Google Cloud Scheduler (`deploy/gcp/cloud-scheduler-refresh.yaml`).
+- **Non-Destructive Guarantee**:
+  - An update from the metadata provider will **never** alter or decrease a user's recorded `watched_episodes`.
+  - If a user's progress exceeds the provider's total episode count (`watched > new_total`), a conflict flag is raised (`CONFLICT_EPISODES`), user data is safely preserved without change, and a clear notification is displayed in the UI.
+
+---
+
+---
+
+## 8. Motion Design System & Tokens
 
 KAGE implements an editorial motion system balancing tactile feedback with accessibility:
 
@@ -144,14 +181,15 @@ KAGE implements an editorial motion system balancing tactile feedback with acces
 
 ---
 
-## 7. Google Cloud Production Deployment
+## 9. Google Cloud Production Deployment
 
 ### Target GCP Architecture
 - **Compute**: Google Cloud Run (`kage-web` and `kage-api` services)
 - **Database**: Google Cloud SQL (PostgreSQL 16 Enterprise, automated backups, point-in-time recovery)
 - **Image Registry**: Google Artifact Registry (`kage-containers`)
-- **Secrets Management**: Google Secret Manager (`KAGE_DATABASE_URL`, `KAGE_SECRET_KEY`)
+- **Secrets Management**: Google Secret Manager (`KAGE_DATABASE_URL`, `KAGE_SECRET_KEY`, `KAGE_SCHEDULER_SECRET_TOKEN`)
 - **Identity**: Least-privilege runtime service account (`kage-cloudrun-runtime`)
+- **Automation**: Google Cloud Scheduler for periodic non-destructive metadata refresh (`deploy/gcp/cloud-scheduler-refresh.yaml`)
 - **CI/CD**: Keyless GitHub Actions via Workload Identity Federation
 
 ### Deployment Steps
@@ -178,6 +216,15 @@ gcloud run jobs execute kage-db-migrate --region=us-central1 --wait
 # 4. Deploy Backend and Frontend Cloud Run services
 gcloud run services replace deploy/gcp/cloudrun-backend.yaml --region=us-central1
 gcloud run services replace deploy/gcp/cloudrun-frontend.yaml --region=us-central1
+
+# 5. Provision Google Cloud Scheduler for background episode auto-refresh
+gcloud scheduler jobs create http kage-metadata-refresh-job \
+  --location=us-central1 \
+  --schedule="0 */6 * * *" \
+  --uri="https://kage-api-${PROJECT_ID}.a.run.app/api/v1/metadata/refresh/batch?limit=50" \
+  --http-method=POST \
+  --headers="X-Scheduler-Token=${SCHEDULER_SECRET_TOKEN},Content-Type=application/json" \
+  --time-zone="Etc/UTC"
 ```
 
 ### Rollback & Disaster Recovery
@@ -192,15 +239,16 @@ gcloud run services replace deploy/gcp/cloudrun-frontend.yaml --region=us-centra
 
 ---
 
-## 8. Cost Considerations
+## 10. Cost Considerations
 
 - **Cloud Run**: Scales to zero when idle ($0 compute during inactive periods).
 - **Cloud SQL**: Smallest production tier (`db-custom-1-3840`) runs 24/7 (~$40-$50/month). For development, scale down or pause the instance when inactive.
+- **Cloud Scheduler**: First 3 jobs free per Google Cloud billing account.
 - **Artifact Registry**: Minimal storage cost (~$0.10/GB/month).
 - **Secret Manager**: Free tier covers first 6 active secret versions and 10,000 access operations.
 
 ---
 
-## 9. License
+## 11. License
 
 KAGE is open-source software licensed under the MIT License.

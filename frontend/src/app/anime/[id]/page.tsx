@@ -43,7 +43,7 @@ export default function AnimeDetailPage({
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-kage-bg font-mono text-xs text-kage-text-muted">
-        LOADING ENTRY...
+        Loading show...
       </div>
     );
   }
@@ -55,14 +55,14 @@ export default function AnimeDetailPage({
         <main className="flex flex-1 flex-col items-center justify-center p-4 text-center">
           <h1 className="text-xl font-bold uppercase tracking-wider text-white">404 // Not Found</h1>
           <p className="mt-2 text-xs text-kage-text-muted">
-            The requested anime does not exist in your personal collection.
+            This show is not in your list.
           </p>
           <Link
             href="/collection"
             className="mt-6 inline-flex items-center space-x-1 border border-kage-border bg-kage-surface px-4 py-2 text-xs text-white hover:border-kage-border-focus"
           >
             <ArrowLeft className="h-3 w-3" />
-            <span>Return to Collection</span>
+            <span>Back to My List</span>
           </Link>
         </main>
       </div>
@@ -80,7 +80,7 @@ export default function AnimeDetailPage({
             className="inline-flex items-center space-x-1.5 font-mono text-xs text-kage-text-muted hover:text-white mb-6"
           >
             <ArrowLeft className="h-3 w-3" />
-            <span>Back to Collection</span>
+            <span>Back to My List</span>
           </Link>
 
           {/* Main Editorial Hero */}
@@ -100,7 +100,7 @@ export default function AnimeDetailPage({
                     <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
                       <Film className="h-12 w-12 stroke-[1] text-kage-border-focus" />
                       <span className="mt-2 font-mono text-[10px] uppercase tracking-widest text-kage-text-muted">
-                        No Artwork
+                        No Image
                       </span>
                     </div>
                   )}
@@ -135,7 +135,7 @@ export default function AnimeDetailPage({
                 {/* Progress Strip */}
                 <div className="border border-kage-border bg-kage-bg p-4">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-                    Episode Progress
+                    Episodes Watched
                   </span>
                   <div className="mt-1 font-mono text-2xl font-bold text-white">
                     {anime.watched_episodes}{" "}
@@ -180,7 +180,7 @@ export default function AnimeDetailPage({
                 {anime.notes && (
                   <div>
                     <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-                      Notes
+                      My Notes
                     </span>
                     <p className="mt-1 text-xs text-kage-text-secondary leading-relaxed border-l-2 border-kage-border-focus pl-3">
                       {anime.notes}
@@ -195,7 +195,7 @@ export default function AnimeDetailPage({
                     className="flex items-center space-x-2 border border-kage-text-primary bg-kage-text-primary px-4 py-2 text-xs font-semibold tracking-wider text-kage-bg hover:opacity-90 active:scale-95"
                   >
                     <Edit3 className="h-3.5 w-3.5" />
-                    <span>Edit & Track</span>
+                    <span>Edit Show</span>
                   </button>
                 </div>
               </div>

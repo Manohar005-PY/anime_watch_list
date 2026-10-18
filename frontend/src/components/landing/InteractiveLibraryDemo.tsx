@@ -56,8 +56,8 @@ export function InteractiveLibraryDemo() {
       <div className="flex flex-wrap items-center justify-between border-b border-kage-border pb-4 font-mono text-[11px] text-kage-text-muted gap-2">
         <div className="flex items-center space-x-2">
           <span className="h-2 w-2 bg-white animate-pulse" />
-          <span className="text-white font-semibold">INTERACTIVE SIMULATION // 01</span>
-          <span className="hidden sm:inline text-kage-text-muted">— TRY THE TACTILE CONTROLS</span>
+          <span className="text-white font-semibold">LIVE PREVIEW</span>
+          <span className="hidden sm:inline text-kage-text-muted">— TRY OUT THE CONTROLS</span>
         </div>
         <div className="flex items-center space-x-3">
           <span className="border border-kage-border px-2 py-0.5 text-[10px]">
@@ -90,7 +90,7 @@ export function InteractiveLibraryDemo() {
 
             {/* Corner Coordinates */}
             <span className="absolute top-2 left-2 border border-black/80 bg-black/80 px-1.5 py-0.5 font-mono text-[9px] text-white">
-              SPECIMEN // 1998
+              CLASSIC // 1998
             </span>
 
             {/* Completion Celebration Overlay */}
@@ -104,10 +104,10 @@ export function InteractiveLibraryDemo() {
                 >
                   <Sparkles className="h-8 w-8 text-white mb-2" />
                   <span className="font-mono text-xs font-bold text-white tracking-widest uppercase">
-                    SERIES COMPLETED
+                    FINISHED!
                   </span>
                   <span className="mt-1 font-mono text-[10px] text-kage-text-secondary">
-                    All 26 episodes archived.
+                    All 26 episodes watched.
                   </span>
                 </motion.div>
               )}
@@ -146,8 +146,8 @@ export function InteractiveLibraryDemo() {
             </div>
 
             <p className="mt-4 text-xs sm:text-sm text-kage-text-secondary leading-relaxed">
-              Experience the tactile sensation of managing an anime record. Click the quick-increment
-              button to advance episodes or toggle status to test immediate feedback.
+              See how smooth tracking your progress is. Click the +1 episode button or switch the
+              status to see the instant update.
             </p>
           </div>
 
@@ -162,7 +162,7 @@ export function InteractiveLibraryDemo() {
               />
               <div>
                 <div className="font-mono text-[11px] text-kage-text-muted uppercase">
-                  EPISODE PROGRESS
+                  EPISODES WATCHED
                 </div>
                 <div className="flex items-baseline space-x-1.5 font-mono">
                   <span className="text-2xl font-extrabold text-white">
@@ -196,7 +196,7 @@ export function InteractiveLibraryDemo() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             <div>
               <span className="block font-mono text-[10px] text-kage-text-muted uppercase mb-2">
-                CATALOGUE STATUS
+                WATCH STATUS
               </span>
               <div className="flex border border-kage-border bg-kage-bg p-1 space-x-1 font-mono text-[11px]">
                 <button
@@ -224,7 +224,7 @@ export function InteractiveLibraryDemo() {
 
             <div>
               <span className="block font-mono text-[10px] text-kage-text-muted uppercase mb-2">
-                PERSONAL RATING
+                MY RATING
               </span>
               <div className="flex items-center space-x-1 border border-kage-border bg-kage-bg p-2 font-mono text-xs">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((starVal) => (
@@ -250,8 +250,8 @@ export function InteractiveLibraryDemo() {
 
       {/* Footer Disclaimer */}
       <div className="mt-6 border-t border-kage-border/80 pt-3 flex items-center justify-between font-mono text-[10px] text-kage-text-muted">
-        <span>DEMO DATA // PERSISTENCE REQUIRES AUTHENTICATED ACCOUNT</span>
-        <span>ZERO SYNTHETIC REVIEWS</span>
+        <span>INTERACTIVE PREVIEW // CREATE AN ACCOUNT TO SAVE YOUR PROGRESS</span>
+        <span>NO FAKE REVIEWS</span>
       </div>
     </div>
   );

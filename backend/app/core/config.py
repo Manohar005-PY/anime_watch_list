@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     RATE_LIMIT_LOGIN_MAX: int = 5
     RATE_LIMIT_WINDOW_SECONDS: int = 300
 
+    # Metadata Provider & Scheduled Refresh
+    METADATA_PROVIDER: str = "kitsu"  # "kitsu", "mock"
+    SCHEDULER_SECRET_TOKEN: str = "dev-scheduler-secret-token-change-in-production"
+    METADATA_REFRESH_BATCH_SIZE: int = 50
+
     # Database
     DATABASE_URL: str = "postgresql://kage:kage_dev_secret@localhost:5432/kage_db"
 

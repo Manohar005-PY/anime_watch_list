@@ -25,10 +25,10 @@ export function EditorialShowcaseGallery() {
           <div>
             <div className="flex items-center space-x-2 font-mono text-xs text-kage-text-muted">
               <span className="h-1.5 w-1.5 bg-white" />
-              <span>ARCHIVAL CANON // MASTERPIECE GALLERY</span>
+              <span>POPULAR CLASSICS // TIMELESS ANIME</span>
             </div>
             <h2 className="mt-2 text-2xl sm:text-4xl font-extrabold tracking-tight text-white uppercase">
-              Curated by aesthetic & historical significance.
+              Iconic shows worth watching.
             </h2>
           </div>
 
@@ -122,7 +122,7 @@ export function EditorialShowcaseGallery() {
                 </h3>
                 <div className="mt-1 flex items-center justify-between font-mono text-[10px] text-kage-text-muted">
                   <span className="truncate max-w-[140px]">{anime.native}</span>
-                  <span>{anime.episodes} EP</span>
+                  <span>{anime.episodes} Ep</span>
                 </div>
               </div>
             </motion.div>

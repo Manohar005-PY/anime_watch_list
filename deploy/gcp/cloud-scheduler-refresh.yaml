@@ -1,0 +1,41 @@
+# ==============================================================================
+# Google Cloud Scheduler Job Specification: KAGE Metadata Auto-Refresh
+# ==============================================================================
+# Triggers periodic batch synchronization for ongoing series to update episode counts
+# and discover missing cover artwork safely and idempotently.
+#
+# Create / update using gcloud CLI:
+# gcloud scheduler jobs create http kage-metadata-refresh-job \
+#     --location=us-central1 \
+#     --schedule="0 */6 * * *" \
+#     --uri="https://kage-backend-<hash>-uc.a.run.app/api/v1/metadata/refresh/batch?limit=50" \
+#     --http-method=POST \
+#     --headers="X-Scheduler-Token=${SCHEDULER_SECRET_TOKEN},Content-Type=application/json" \
+#     --time-zone="Etc/UTC" \
+#     --attempt-deadline=300s \
+#     --max-retry-attempts=3 \
+#     --min-backoff=10s
+# ==============================================================================
+
+apiVersion: cloudscheduler.cnrm.cloud.google.com/v1beta1
+kind: CloudSchedulerJob
+metadata:
+  name: kage-metadata-refresh
+  annotations:
+    cnrm.cloud.google.com/project-id: "${PROJECT_ID}"
+spec:
+  region: "us-central1"
+  schedule: "0 */6 * * *" # Every 6 hours
+  timeZone: "Etc/UTC"
+  description: "Periodic non-destructive anime metadata and episode count refresh for KAGE"
+  httpTarget:
+    httpMethod: "POST"
+    uri: "https://kage-backend-${PROJECT_ID}.a.run.app/api/v1/metadata/refresh/batch?limit=50"
+    headers:
+      X-Scheduler-Token: "${SCHEDULER_SECRET_TOKEN}"
+      Content-Type: "application/json"
+    retryConfig:
+      retryCount: 3
+      maxRetryDuration: "300s"
+      minBackoffDuration: "10s"
+      maxBackoffDuration: "60s"

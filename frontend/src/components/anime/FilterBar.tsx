@@ -34,12 +34,12 @@ export function FilterBar({
   onViewModeChange,
 }: FilterBarProps) {
   const statusOptions: { label: string; value: AnimeStatus | "ALL" }[] = [
-    { label: "ALL", value: "ALL" },
-    { label: "WATCHING", value: "WATCHING" },
-    { label: "COMPLETED", value: "COMPLETED" },
-    { label: "PLAN TO WATCH", value: "PLANNED" },
-    { label: "PAUSED", value: "PAUSED" },
-    { label: "DROPPED", value: "DROPPED" },
+    { label: "All Shows", value: "ALL" },
+    { label: "Watching", value: "WATCHING" },
+    { label: "Completed", value: "COMPLETED" },
+    { label: "Plan to Watch", value: "PLANNED" },
+    { label: "On Hold", value: "PAUSED" },
+    { label: "Dropped", value: "DROPPED" },
   ];
 
   return (
@@ -53,7 +53,7 @@ export function FilterBar({
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search anime by title, alternate title..."
+            placeholder="Search shows by title..."
             className="w-full border border-kage-border bg-kage-surface py-2 pl-9 pr-8 text-xs text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
           />
           {search && (

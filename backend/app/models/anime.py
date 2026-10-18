@@ -39,6 +39,15 @@ class AnimeEntry(Base):
     
     started_at = Column(Date, nullable=True)
     completed_at = Column(Date, nullable=True)
+    
+    # Metadata Enrichment & Auto-Refresh tracking
+    metadata_provider = Column(String(50), nullable=True)
+    provider_media_id = Column(String(100), nullable=True, index=True)
+    metadata_last_checked_at = Column(DateTime, nullable=True)
+    metadata_last_updated_at = Column(DateTime, nullable=True)
+    metadata_sync_status = Column(String(30), nullable=False, default="CURRENT")
+    total_episodes_source = Column(String(30), nullable=True, default="MANUAL")
+
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)
     updated_at = Column(
         DateTime,

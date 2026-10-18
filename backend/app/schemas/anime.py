@@ -128,6 +128,12 @@ class AnimeResponse(BaseModel):
     genres: List[str] = []
     started_at: Optional[date] = None
     completed_at: Optional[date] = None
+    metadata_provider: Optional[str] = None
+    provider_media_id: Optional[str] = None
+    metadata_last_checked_at: Optional[datetime] = None
+    metadata_last_updated_at: Optional[datetime] = None
+    metadata_sync_status: Optional[str] = "CURRENT"
+    total_episodes_source: Optional[str] = "MANUAL"
     created_at: datetime
     updated_at: datetime
 

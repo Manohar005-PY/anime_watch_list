@@ -61,10 +61,10 @@ function ResetPasswordForm() {
     <div className="w-full max-w-md border border-kage-border bg-kage-surface p-8 shadow-2xl">
       <div className="border-b border-kage-border pb-4 text-center">
         <span className="font-mono text-xs tracking-widest text-kage-text-muted uppercase">
-          SECURITY ROTATION
+          PASSWORD RESET
         </span>
         <h1 className="mt-1 text-xl font-bold tracking-tight text-white uppercase">
-          Set New Password
+          Choose New Password
         </h1>
       </div>
 
@@ -81,16 +81,16 @@ function ResetPasswordForm() {
             <CheckCircle2 className="h-6 w-6" />
           </div>
           <h2 className="text-sm font-semibold text-white uppercase tracking-wider">
-            Password Reset Complete
+            Password Changed
           </h2>
           <p className="text-xs text-kage-text-muted">
-            All existing sessions have been rotated. Redirecting to login...
+            Your password has been updated. Taking you to login...
           </p>
           <Link
             href="/login"
             className="inline-block mt-2 font-mono text-xs text-white hover:underline"
           >
-            Click here to sign in immediately
+            Log in now
           </Link>
         </div>
       ) : (
@@ -108,7 +108,7 @@ function ResetPasswordForm() {
               required
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              placeholder="Paste 32-character token"
+              placeholder="Paste reset token"
               className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs font-mono text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
             />
           </div>
@@ -154,14 +154,14 @@ function ResetPasswordForm() {
             disabled={loading}
             className="mt-2 w-full border border-kage-text-primary bg-kage-text-primary py-2.5 text-xs font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95 disabled:opacity-50"
           >
-            {loading ? "Updating Password..." : "Update Password & Invalidate Sessions"}
+            {loading ? "Updating..." : "Save New Password"}
           </button>
         </form>
       )}
 
       <div className="mt-6 border-t border-kage-border pt-4 text-center">
         <Link href="/login" className="text-xs text-kage-text-muted hover:text-white">
-          Cancel and return to Login
+          Back to Login
         </Link>
       </div>
     </div>

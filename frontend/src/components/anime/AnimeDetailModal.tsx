@@ -13,8 +13,9 @@ import {
   Minus,
   CheckCircle2,
   AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
-import { AnimeEntry, AnimeStatus, animeApi } from "@/lib/api";
+import { AnimeEntry, AnimeStatus, animeApi, refreshApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
 interface AnimeDetailModalProps {
@@ -38,6 +39,8 @@ export function AnimeDetailModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshMessage, setRefreshMessage] = useState<string | null>(null);
 
   // Form states
   const [title, setTitle] = useState(anime?.title || "");
@@ -162,6 +165,23 @@ export function AnimeDetailModal({
     }
   };
 
+  const handleRefreshMetadata = async () => {
+    if (!anime) return;
+    try {
+      setRefreshing(true);
+      setRefreshMessage(null);
+      const res = await refreshApi.refreshAnime(anime.id);
+      setRefreshMessage(res.message);
+      const updated = await animeApi.get(anime.id);
+      onAnimeUpdated(updated);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to sync metadata.";
+      setRefreshMessage(`Sync error: ${msg}`);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const progressPercent = anime.total_episodes
     ? Math.min(100, Math.round((watchedEpisodes / anime.total_episodes) * 100))
     : 0;
@@ -190,7 +210,7 @@ export function AnimeDetailModal({
           <div className="flex items-center justify-between border-b border-kage-border pb-3">
             <div className="flex items-center space-x-2">
               <span className="font-mono text-xs uppercase tracking-widest text-kage-text-muted">
-                ENTRY DETAIL
+                SHOW DETAILS
               </span>
               <span className="text-kage-border">/</span>
               <span className="font-mono text-xs text-kage-text-secondary">{anime.status}</span>
@@ -240,7 +260,7 @@ export function AnimeDetailModal({
                     <div className="flex h-full w-full flex-col items-center justify-center p-4 text-center">
                       <Film className="h-10 w-10 stroke-[1] text-kage-border-focus" />
                       <span className="mt-2 font-mono text-[9px] tracking-widest text-kage-text-muted uppercase">
-                        No Artwork
+                        No Image
                       </span>
                     </div>
                   )}
@@ -250,7 +270,7 @@ export function AnimeDetailModal({
                 {anime.total_episodes && (
                   <div className="mt-3">
                     <div className="flex justify-between font-mono text-[10px] text-kage-text-muted">
-                      <span>PROGRESS</span>
+                      <span>WATCHED</span>
                       <span>{progressPercent}%</span>
                     </div>
                     <div className="mt-1 h-1.5 w-full bg-kage-border">
@@ -273,27 +293,55 @@ export function AnimeDetailModal({
                   )}
                 </div>
 
+                {/* Metadata Conflict Notice */}
+                {anime.metadata_sync_status === "CONFLICT_EPISODES" && (
+                  <div className="border border-amber-500/40 bg-amber-950/20 p-3 flex items-start space-x-2.5 text-xs text-amber-300">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold">Progress Protected:</span> You&apos;ve watched {anime.watched_episodes} episodes, but the database says there are only {anime.total_episodes} episodes total. We kept your progress safe.
+                    </div>
+                  </div>
+                )}
+
+                {/* Refresh Message Feedback */}
+                {refreshMessage && (
+                  <div className="border border-kage-border bg-kage-bg p-2 text-xs font-mono text-white flex items-center justify-between">
+                    <span>{refreshMessage}</span>
+                    <button
+                      type="button"
+                      onClick={() => setRefreshMessage(null)}
+                      className="text-kage-text-muted hover:text-white text-[10px]"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
                 {/* Interactive Status Selector */}
                 <div>
                   <span className="block font-mono text-[10px] uppercase tracking-wider text-kage-text-muted mb-1.5">
-                    Watch Status
+                    Status
                   </span>
                   <div className="flex flex-wrap gap-1.5">
-                    {(["WATCHING", "COMPLETED", "PLANNED", "PAUSED", "DROPPED"] as AnimeStatus[]).map(
-                      (st) => (
-                        <button
-                          key={st}
-                          onClick={() => handleStatusChange(st)}
-                          className={`border px-2.5 py-1 text-[11px] font-mono tracking-wider transition-colors ${
-                            status === st
-                              ? "border-kage-text-primary bg-kage-text-primary text-kage-bg font-semibold"
-                              : "border-kage-border bg-kage-bg text-kage-text-secondary hover:border-kage-border-focus hover:text-kage-text-primary"
-                          }`}
-                        >
-                          {st}
-                        </button>
-                      )
-                    )}
+                    {([
+                      { value: "WATCHING", label: "Watching" },
+                      { value: "COMPLETED", label: "Completed" },
+                      { value: "PLANNED", label: "Plan to Watch" },
+                      { value: "PAUSED", label: "On Hold" },
+                      { value: "DROPPED", label: "Dropped" },
+                    ] as const).map(({ value: st, label }) => (
+                      <button
+                        key={st}
+                        onClick={() => handleStatusChange(st as AnimeStatus)}
+                        className={`border px-2.5 py-1 text-[11px] font-mono tracking-wider transition-colors ${
+                          status === st
+                            ? "border-kage-text-primary bg-kage-text-primary text-kage-bg font-semibold"
+                            : "border-kage-border bg-kage-bg text-kage-text-secondary hover:border-kage-border-focus hover:text-kage-text-primary"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -302,7 +350,7 @@ export function AnimeDetailModal({
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-                        Episode Progress
+                        Episodes Watched
                       </span>
                       <div className="mt-1 flex items-baseline space-x-1 font-mono text-base font-bold text-kage-text-primary">
                         <span>{watchedEpisodes}</span>
@@ -336,7 +384,7 @@ export function AnimeDetailModal({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <span className="block font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-                      Personal Rating
+                      My Rating
                     </span>
                     <div className="mt-1 flex items-center space-x-1 font-mono text-sm text-kage-text-primary">
                       <Star className={`h-4 w-4 ${anime.rating ? "fill-white text-white" : "text-kage-text-muted"}`} />
@@ -367,7 +415,7 @@ export function AnimeDetailModal({
                 {anime.notes && (
                   <div>
                     <span className="block font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
-                      Personal Notes
+                      My Notes
                     </span>
                     <p className="mt-1 border-l-2 border-kage-border-focus pl-3 text-xs text-kage-text-secondary leading-relaxed">
                       {anime.notes}
@@ -375,8 +423,8 @@ export function AnimeDetailModal({
                   </div>
                 )}
 
-                {/* Timestamps */}
-                <div className="flex items-center space-x-4 border-t border-kage-border/80 pt-3 font-mono text-[10px] text-kage-text-muted">
+                {/* Timestamps & Metadata Tracking */}
+                <div className="flex flex-wrap items-center gap-3 border-t border-kage-border/80 pt-3 font-mono text-[10px] text-kage-text-muted">
                   <div className="flex items-center space-x-1">
                     <Calendar className="h-3 w-3" />
                     <span>Added: {new Date(anime.created_at).toLocaleDateString()}</span>
@@ -384,6 +432,16 @@ export function AnimeDetailModal({
                   {anime.completed_at && (
                     <div>
                       <span>Finished: {new Date(anime.completed_at).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  {anime.metadata_provider && (
+                    <div className="flex items-center space-x-1 border border-kage-border px-1.5 py-0.5 text-kage-text-secondary">
+                      <span>Source: {anime.metadata_provider}</span>
+                      {anime.metadata_last_checked_at && (
+                        <span>
+                          • Updated: {new Date(anime.metadata_last_checked_at).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -417,12 +475,24 @@ export function AnimeDetailModal({
                     </button>
                   )}
 
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="border border-kage-border bg-kage-surface-raised px-4 py-1.5 text-xs font-medium tracking-wider text-kage-text-primary hover:border-kage-border-focus"
-                  >
-                    Edit Details
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={handleRefreshMetadata}
+                      disabled={refreshing}
+                      className="flex items-center space-x-1.5 border border-kage-border bg-kage-bg px-3 py-1.5 text-xs font-mono text-kage-text-secondary hover:border-white hover:text-white disabled:opacity-40"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+                      <span>{refreshing ? "Refreshing..." : "Refresh Details"}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="border border-kage-border bg-kage-surface-raised px-4 py-1.5 text-xs font-medium tracking-wider text-kage-text-primary hover:border-kage-border-focus"
+                    >
+                      Edit Show
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -467,7 +537,7 @@ export function AnimeDetailModal({
                     <option value="WATCHING">Watching</option>
                     <option value="COMPLETED">Completed</option>
                     <option value="PLANNED">Plan to Watch</option>
-                    <option value="PAUSED">Paused</option>
+                    <option value="PAUSED">On Hold</option>
                     <option value="DROPPED">Dropped</option>
                   </select>
                 </div>
@@ -494,7 +564,7 @@ export function AnimeDetailModal({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
-                    Watched Episodes
+                    Episodes Watched
                   </label>
                   <input
                     type="number"
@@ -521,7 +591,7 @@ export function AnimeDetailModal({
 
               <div>
                 <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
-                  Poster URL (https)
+                  Poster Image URL
                 </label>
                 <input
                   type="url"
@@ -533,7 +603,7 @@ export function AnimeDetailModal({
 
               <div>
                 <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
-                  Personal Notes
+                  My Notes
                 </label>
                 <textarea
                   rows={3}

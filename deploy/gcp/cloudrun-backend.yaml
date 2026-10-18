@@ -47,6 +47,13 @@ spec:
               value: "lax"
             - name: BACKEND_CORS_ORIGINS
               value: "https://kage.app,https://kage-web-prod.run.app"
+            - name: METADATA_PROVIDER
+              value: "kitsu"
+            - name: SCHEDULER_SECRET_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: KAGE_SCHEDULER_SECRET_TOKEN
+                  key: latest
           livenessProbe:
             httpGet:
               path: /health

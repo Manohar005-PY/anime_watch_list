@@ -47,13 +47,13 @@ export default function StatsPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-kage-border pb-6">
             <div>
               <span className="font-mono text-[10px] tracking-widest text-kage-text-muted uppercase">
-                ANALYTICS // TELEMETRY
+                STATS & HABITS
               </span>
               <h1 className="mt-1 text-2xl font-bold tracking-tight text-white uppercase">
-                Library Statistics
+                Your Watch Stats
               </h1>
               <p className="mt-1 text-xs text-kage-text-secondary">
-                Verifiable metrics derived exclusively from your authenticated library database records.
+                Here is a breakdown of what you&apos;ve watched, your top genres, and ratings.
               </p>
             </div>
 
@@ -70,15 +70,15 @@ export default function StatsPage() {
           <div className="mt-8">
             {loading ? (
               <div className="flex h-64 items-center justify-center font-mono text-xs text-kage-text-muted">
-                COMPUTING METRICS...
+                Loading stats...
               </div>
             ) : stats && stats.total_titles > 0 ? (
               <StatsCharts stats={stats} />
             ) : (
               <EmptyState
-                title="No viewing metrics yet"
-                description="Add anime titles to your collection and record episode progress to generate real viewing statistics."
-                actionLabel="Go to Collection"
+                title="No stats yet"
+                description="Add shows to your list and log episodes to see your stats here."
+                actionLabel="Go to My List"
                 onAction={() => router.push("/collection")}
               />
             )}

@@ -121,7 +121,7 @@ export default function LandingPage() {
                   className="inline-flex items-center space-x-2.5 border border-kage-border bg-kage-surface px-3.5 py-1.5 font-mono text-xs tracking-wider text-kage-text-secondary"
                 >
                   <span className="h-2 w-2 bg-white" />
-                  <span className="font-bold text-white">KAGE // ARCHIVE SPECIFICATION</span>
+                  <span className="font-bold text-white">KAGE // PERSONAL ANIME WATCHLIST</span>
                   <span className="text-kage-text-muted">|</span>
                   <span className="hidden sm:inline text-kage-text-muted">個人用アニメ目録</span>
                 </motion.div>
@@ -133,7 +133,7 @@ export default function LandingPage() {
                     className="text-4xl sm:text-6xl xl:text-7xl font-extrabold tracking-tighter text-white uppercase leading-[0.95]"
                   >
                     THE PERSONAL <br />
-                    <span className="text-neutral-400">ANIME ARCHIVE.</span>
+                    <span className="text-neutral-400">ANIME WATCHLIST.</span>
                   </motion.h1>
                 </div>
 
@@ -141,9 +141,8 @@ export default function LandingPage() {
                   variants={lineRevealVariants}
                   className="mt-6 max-w-2xl text-base sm:text-lg text-kage-text-secondary leading-relaxed"
                 >
-                  An art-directed media catalog built with tactile monochrome minimalism,
-                  strictly isolated user storage, and authentic progress tracking.
-                  Zero synthetic reviews, zero vanity metrics.
+                  A beautiful, distraction-free space to track every show you watch, rate your
+                  favorites, and log your progress. No social noise, no ads, no fake reviews.
                 </motion.p>
 
                 {/* Primary & Secondary Call to Actions */}
@@ -155,7 +154,7 @@ export default function LandingPage() {
                     href={user ? "/dashboard" : "/register"}
                     className="group relative flex items-center space-x-3 border border-white bg-white px-7 py-3.5 text-xs sm:text-sm font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 shadow-tactile"
                   >
-                    <span>{user ? "ENTER DASHBOARD" : "CREATE YOUR ARCHIVE"}</span>
+                    <span>{user ? "ENTER DASHBOARD" : "START YOUR WATCHLIST"}</span>
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
 
@@ -163,7 +162,7 @@ export default function LandingPage() {
                     href={user ? "/collection" : "/login"}
                     className="border border-kage-border bg-kage-surface px-7 py-3.5 text-xs sm:text-sm font-semibold tracking-wider text-white hover:border-kage-border-focus hover:bg-kage-surface-raised transition-all"
                   >
-                    <span>{user ? "BROWSE LIBRARY" : "EXISTING MEMBER LOGIN"}</span>
+                    <span>{user ? "BROWSE LIBRARY" : "LOG IN"}</span>
                   </Link>
                 </motion.div>
 
@@ -174,15 +173,15 @@ export default function LandingPage() {
                 >
                   <div className="flex items-center space-x-2">
                     <ShieldCheck className="h-4 w-4 text-white" />
-                    <span>Argon2id Encrypted Sessions</span>
+                    <span>Private & Secure</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Database className="h-4 w-4 text-white" />
-                    <span>PostgreSQL 16 Isolated Data</span>
+                    <span>Your Own Personal List</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Film className="h-4 w-4 text-white" />
-                    <span>Verified AniList Metadata</span>
+                    <span>Accurate Episode & Show Info</span>
                   </div>
                 </motion.div>
               </motion.div>
@@ -284,11 +283,10 @@ export default function LandingPage() {
                 <span>SECTION // 02</span>
               </div>
               <h2 className="mt-2 text-2xl sm:text-4xl font-extrabold tracking-tight text-white uppercase">
-                Your library in motion.
+                Track your shows with ease.
               </h2>
               <p className="mt-3 text-sm sm:text-base text-kage-text-secondary">
-                Track episode-by-episode progress with tactile controls, animated progress gauges,
-                and instant status transitions. Test the interaction below:
+                Update episodes in one click, mark shows as finished, and see your progress instantly. Try it out below:
               </p>
             </div>
 
@@ -303,10 +301,10 @@ export default function LandingPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="border-b border-kage-border pb-6">
               <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
-                ENGINEERING PILLARS // ARCHITECTURE
+                WHY CHOOSE KAGE
               </span>
               <h2 className="mt-2 text-2xl sm:text-4xl font-extrabold tracking-tight text-white uppercase">
-                Designed for serious anime curation.
+                Built for anime lovers.
               </h2>
             </div>
 
@@ -319,15 +317,15 @@ export default function LandingPage() {
                     <Lock className="h-4 w-4 text-white" />
                   </div>
                   <h3 className="mt-6 text-lg font-bold text-white uppercase tracking-tight">
-                    Cryptographic Isolation
+                    100% Private
                   </h3>
                   <p className="mt-3 text-xs sm:text-sm text-kage-text-secondary leading-relaxed">
-                    Zero public profiling, zero social clutter, and zero data leakage. Every record,
-                    note, and rating is encrypted and verified against your authenticated session ID.
+                    No public profiles, no feeds, and no unwanted followers. Your notes, ratings,
+                    and watch history are strictly for your eyes only.
                   </p>
                 </div>
                 <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-[10px] text-kage-text-muted">
-                  ARGON2ID • SHA-256 SESSIONS • IDOR IMMUNITY
+                  SECURE SESSIONS • FULL PRIVACY
                 </div>
               </div>
 
@@ -339,15 +337,15 @@ export default function LandingPage() {
                     <Sliders className="h-4 w-4 text-white" />
                   </div>
                   <h3 className="mt-6 text-lg font-bold text-white uppercase tracking-tight">
-                    Tactile Episode Curation
+                    Simple Episode Tracking
                   </h3>
                   <p className="mt-3 text-xs sm:text-sm text-kage-text-secondary leading-relaxed">
-                    Strict bounds checking guarantees you never record episode 27 of a 26-episode series.
-                    Enjoy instant optimistic updates with server-side rollback resilience.
+                    One-click episode counter with built-in limit checks so you never accidentally
+                    overshoot the episode count.
                   </p>
                 </div>
                 <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-[10px] text-kage-text-muted">
-                  STRICT EPISODE CONSTRAINTS • OPTIMISTIC UI
+                  ONE-CLICK TRACKING • INSTANT SYNC
                 </div>
               </div>
 
@@ -359,15 +357,15 @@ export default function LandingPage() {
                     <BarChart2 className="h-4 w-4 text-white" />
                   </div>
                   <h3 className="mt-6 text-lg font-bold text-white uppercase tracking-tight">
-                    Authentic Viewing Geometry
+                    Honest Stats & Habits
                   </h3>
                   <p className="mt-3 text-xs sm:text-sm text-kage-text-secondary leading-relaxed">
-                    View true distribution curves, completion rates, and genre breakdowns computed
-                    solely from your persistent database rows. No fake vanity numbers.
+                    See real stats on how many hours you&apos;ve spent watching, your favorite
+                    genres, and your rating habits.
                   </p>
                 </div>
                 <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-[10px] text-kage-text-muted">
-                  SQL RELATIONAL METRICS • ZERO FABRICATED DATA
+                  REAL STATS • NO ADS OR TRACKERS
                 </div>
               </div>
             </div>
@@ -382,11 +380,10 @@ export default function LandingPage() {
               // 映画的・個人用アニメ目録 //
             </span>
             <h2 className="mt-4 text-3xl sm:text-6xl font-extrabold tracking-tighter text-white uppercase leading-[0.95]">
-              Begin your anime archive.
+              Start your anime watchlist today.
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-sm sm:text-base text-kage-text-secondary">
-              Step into a quiet, art-directed space built exclusively for your personal watching journey.
-              Set up your library in seconds.
+              Create your clean, distraction-free anime collection in seconds. Free forever.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
@@ -400,7 +397,7 @@ export default function LandingPage() {
                 href={user ? "/collection" : "/login"}
                 className="border border-kage-border bg-kage-surface px-8 py-4 text-xs sm:text-sm font-semibold tracking-wider text-white hover:border-kage-border-focus hover:bg-kage-surface-raised transition-all"
               >
-                {user ? "VIEW COLLECTION" : "SIGN IN TO ARCHIVE"}
+                {user ? "VIEW COLLECTION" : "LOG IN"}
               </Link>
             </div>
           </div>

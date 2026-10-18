@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, ChevronLeft, ChevronRight, Film } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Film, UploadCloud } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { AnimeEntry, AnimeStatus, animeApi } from "@/lib/api";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -10,6 +10,7 @@ import { FilterBar } from "@/components/anime/FilterBar";
 import { AnimeCard } from "@/components/anime/AnimeCard";
 import { AddAnimeModal } from "@/components/anime/AddAnimeModal";
 import { AnimeDetailModal } from "@/components/anime/AnimeDetailModal";
+import { ImportWizardModal } from "@/components/import/ImportWizardModal";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 function CollectionContent() {
@@ -41,6 +42,7 @@ function CollectionContent() {
 
   // Modals
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<AnimeEntry | null>(null);
 
   const fetchAnime = useCallback(async () => {
@@ -99,9 +101,24 @@ function CollectionContent() {
     }
   };
 
+  const handleUpdateStatus = async (anime: AnimeEntry, newStatus: AnimeStatus) => {
+    try {
+      const updated = await animeApi.updateStatus(anime.id, newStatus);
+      setAnimeList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
+      if (selectedAnime?.id === anime.id) {
+        setSelectedAnime(updated);
+      }
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to update status");
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-kage-bg">
-      <AppHeader onOpenAddModal={() => setIsAddOpen(true)} />
+      <AppHeader
+        onOpenAddModal={() => setIsAddOpen(true)}
+        onOpenImportModal={() => setIsImportOpen(true)}
+      />
 
       <main className="flex-1 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
@@ -109,23 +126,33 @@ function CollectionContent() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-kage-border pb-6">
             <div>
               <span className="font-mono text-[10px] tracking-widest text-kage-text-muted uppercase">
-                COLLECTION // INDEX
+                MY COLLECTION
               </span>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight text-white uppercase">
-                Personal Archive
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-white">
+                My Anime List
               </h1>
               <p className="mt-1 text-xs text-kage-text-secondary">
-                {total} {total === 1 ? "title" : "titles"} registered in your private collection.
+                {total} {total === 1 ? "show" : "shows"} in your list.
               </p>
             </div>
 
-            <button
-              onClick={() => setIsAddOpen(true)}
-              className="flex items-center space-x-1.5 border border-kage-text-primary bg-kage-text-primary px-4 py-2 text-xs font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add Anime</span>
-            </button>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setIsImportOpen(true)}
+                className="flex items-center space-x-1.5 border border-kage-border bg-kage-surface px-4 py-2 text-xs font-semibold tracking-wider text-kage-text-primary transition-colors hover:border-white active:scale-95"
+              >
+                <UploadCloud className="h-4 w-4" />
+                <span>Import Anime List</span>
+              </button>
+
+              <button
+                onClick={() => setIsAddOpen(true)}
+                className="flex items-center space-x-1.5 border border-kage-text-primary bg-kage-text-primary px-4 py-2 text-xs font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Anime</span>
+              </button>
+            </div>
           </div>
 
           {/* Filter Bar */}
@@ -177,6 +204,7 @@ function CollectionContent() {
                         viewMode="grid"
                         onSelect={(a) => setSelectedAnime(a)}
                         onIncrementProgress={handleIncrementProgress}
+                        onUpdateStatus={handleUpdateStatus}
                         onToggleFavorite={handleToggleFavorite}
                       />
                     ))}
@@ -190,6 +218,7 @@ function CollectionContent() {
                         viewMode="list"
                         onSelect={(a) => setSelectedAnime(a)}
                         onIncrementProgress={handleIncrementProgress}
+                        onUpdateStatus={handleUpdateStatus}
                         onToggleFavorite={handleToggleFavorite}
                       />
                     ))}
@@ -227,11 +256,11 @@ function CollectionContent() {
               </>
             ) : (
               <EmptyState
-                title={search || statusFilter !== "ALL" ? "No matching titles" : "Empty Collection"}
+                title={search || statusFilter !== "ALL" ? "No shows found" : "Your list is empty"}
                 description={
                   search || statusFilter !== "ALL"
-                    ? "No anime in your collection match the current search or status filter."
-                    : "You haven't added any anime to your library yet. Start your collection now."
+                    ? "We couldn't find any shows matching your search or filters."
+                    : "You haven't added any shows yet. Add your first anime or import your list!"
                 }
                 actionLabel={search || statusFilter !== "ALL" ? "Clear Filters" : "Add Anime"}
                 onAction={() => {
@@ -266,13 +295,19 @@ function CollectionContent() {
           fetchAnime();
         }}
       />
+
+      <ImportWizardModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImportComplete={() => fetchAnime()}
+      />
     </div>
   );
 }
 
 export default function CollectionPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-kage-bg flex items-center justify-center font-mono text-xs text-kage-text-muted">LOADING ARCHIVE...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-kage-bg flex items-center justify-center font-mono text-xs text-kage-text-muted">Loading collection...</div>}>
       <CollectionContent />
     </Suspense>
   );

@@ -13,13 +13,16 @@ import {
   Clock,
   Compass,
   Sparkles,
+  UploadCloud,
+  Check,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { AnimeEntry, UserStats, animeApi, statsApi } from "@/lib/api";
+import { AnimeEntry, AnimeStatus, UserStats, animeApi, statsApi } from "@/lib/api";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AnimeCard } from "@/components/anime/AnimeCard";
 import { AddAnimeModal } from "@/components/anime/AddAnimeModal";
 import { AnimeDetailModal } from "@/components/anime/AnimeDetailModal";
+import { ImportWizardModal } from "@/components/import/ImportWizardModal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProgressRing } from "@/components/ui/ProgressRing";
 import { CURATED_CLASSICS, CuratedAnime } from "@/lib/curated-anime";
@@ -35,6 +38,7 @@ export default function DashboardPage() {
 
   // Modals
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<AnimeEntry | null>(null);
 
   const fetchDashboardData = useCallback(async () => {
@@ -85,6 +89,23 @@ export default function DashboardPage() {
     }
   };
 
+  const handleUpdateStatus = async (anime: AnimeEntry, newStatus: AnimeStatus) => {
+    try {
+      const updated = await animeApi.updateStatus(anime.id, newStatus);
+      if (newStatus === "COMPLETED") {
+        setWatchingList((prev) => prev.filter((item) => item.id !== anime.id));
+      } else {
+        setWatchingList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
+      }
+      if (selectedAnime?.id === anime.id) {
+        setSelectedAnime(updated);
+      }
+      statsApi.get().then(setStats).catch(() => {});
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to update status");
+    }
+  };
+
   const handleQuickAdd = async (preset: CuratedAnime) => {
     try {
       await animeApi.create({
@@ -121,7 +142,7 @@ export default function DashboardPage() {
   if (authLoading || (!user && loading)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-kage-bg font-mono text-xs text-kage-text-muted">
-        LOADING ARCHIVE...
+        Loading dashboard...
       </div>
     );
   }
@@ -131,7 +152,10 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-kage-bg text-kage-text-primary selection:bg-white selection:text-black">
-      <AppHeader onOpenAddModal={() => setIsAddOpen(true)} />
+      <AppHeader
+        onOpenAddModal={() => setIsAddOpen(true)}
+        onOpenImportModal={() => setIsImportOpen(true)}
+      />
 
       <main className="flex-1 pb-16">
         {/* Editorial Subheader Banner */}
@@ -142,25 +166,33 @@ export default function DashboardPage() {
               <div>
                 <div className="flex items-center space-x-2 font-mono text-[10px] tracking-widest text-kage-text-muted uppercase">
                   <span className="h-1.5 w-1.5 bg-white" />
-                  <span>DASHBOARD // TELEMETRY</span>
+                  <span>DASHBOARD // OVERVIEW</span>
                   <span>•</span>
                   <span>個人用アニメ目録</span>
                 </div>
                 <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase">
-                  {user?.display_name ? `${user.display_name}'s Library` : "Personal Archive"}
+                  {user?.display_name ? `${user.display_name}'s Watchlist` : "My Watchlist"}
                 </h1>
                 <p className="mt-1 text-xs text-kage-text-secondary">
-                  Persistent watch progress, rating indices, and authentic library telemetry.
+                  Keep track of what you&apos;re watching, what you&apos;ve finished, and what&apos;s next on your list.
                 </p>
               </div>
 
               <div className="flex items-center space-x-3">
                 <button
+                  onClick={() => setIsImportOpen(true)}
+                  className="flex items-center space-x-2 border border-kage-border bg-kage-surface px-4 py-2.5 text-xs font-bold tracking-wider text-kage-text-primary transition-all hover:border-white active:scale-95 shadow-tactile uppercase"
+                >
+                  <UploadCloud className="h-4 w-4" />
+                  <span>IMPORT LIST</span>
+                </button>
+
+                <button
                   onClick={() => setIsAddOpen(true)}
-                  className="flex items-center space-x-2 border border-white bg-white px-5 py-2.5 text-xs font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 shadow-tactile"
+                  className="flex items-center space-x-2 border border-white bg-white px-5 py-2.5 text-xs font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 shadow-tactile uppercase"
                 >
                   <Plus className="h-4 w-4" />
-                  <span>ADD TITLE</span>
+                  <span>ADD ANIME</span>
                 </button>
               </div>
             </div>
@@ -170,7 +202,7 @@ export default function DashboardPage() {
               <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 border-t border-kage-border/80 pt-6">
                 <div className="border border-kage-border bg-kage-bg p-3.5 shadow-tactile">
                   <span className="font-mono text-[9px] uppercase tracking-wider text-kage-text-muted">
-                    Total Titles
+                    Total Shows
                   </span>
                   <div className="mt-1 font-mono text-xl font-extrabold text-white">
                     {stats.total_titles}
@@ -237,9 +269,9 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between border-b border-kage-border pb-3 font-mono text-[10px] text-kage-text-muted mb-6">
                 <span className="flex items-center space-x-2 text-white font-bold">
                   <span className="h-2 w-2 bg-white animate-pulse" />
-                  <span>NOW SCREENING // PRIORITY ARCHIVE</span>
+                  <span>CURRENTLY WATCHING</span>
                 </span>
-                <span>REC ● 24FPS</span>
+                <span>IN PROGRESS</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
@@ -270,7 +302,7 @@ export default function DashboardPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <span className="border border-kage-border bg-kage-bg px-2 py-0.5 font-mono text-[10px] text-white uppercase">
-                          ACTIVE WATCHING
+                          WATCHING NOW
                         </span>
                         <h2
                           onClick={() => setSelectedAnime(spotlightAnime)}
@@ -317,7 +349,7 @@ export default function DashboardPage() {
                       />
                       <div>
                         <span className="font-mono text-[10px] text-kage-text-muted uppercase">
-                          WATCHED EPISODES
+                          EPISODES WATCHED
                         </span>
                         <div className="flex items-baseline space-x-2 font-mono">
                           <span className="text-2xl font-extrabold text-white">
@@ -339,6 +371,16 @@ export default function DashboardPage() {
                         >
                           <Plus className="h-4 w-4" />
                           <span>+1 EPISODE</span>
+                        </button>
+                      )}
+
+                      {spotlightAnime.status !== "COMPLETED" && (
+                        <button
+                          onClick={() => handleUpdateStatus(spotlightAnime, "COMPLETED")}
+                          className="flex items-center space-x-1.5 border border-kage-border bg-kage-surface px-4 py-2.5 text-xs font-mono text-white hover:border-white transition-colors shadow-tactile"
+                        >
+                          <Check className="h-4 w-4" />
+                          <span>MARK COMPLETED</span>
                         </button>
                       )}
 
@@ -371,7 +413,7 @@ export default function DashboardPage() {
                 href="/collection?status=WATCHING"
                 className="flex items-center space-x-1 text-xs text-kage-text-muted hover:text-white font-mono"
               >
-                <span>View all in collection</span>
+                <span>View all</span>
                 <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -384,6 +426,7 @@ export default function DashboardPage() {
                     anime={anime}
                     onSelect={(a) => setSelectedAnime(a)}
                     onIncrementProgress={handleIncrementProgress}
+                    onUpdateStatus={handleUpdateStatus}
                     onToggleFavorite={handleToggleFavorite}
                   />
                 ))}
@@ -391,9 +434,9 @@ export default function DashboardPage() {
             ) : (
               <div className="mt-6 space-y-6">
                 <EmptyState
-                  title="No active titles in progress"
-                  description="Add an anime to your collection and set status to 'Watching' to track active episode progress here."
-                  actionLabel="Add Custom Title"
+                  title="Nothing to watch right now"
+                  description="Add a show to your list and set it to 'Watching' to track your episodes here."
+                  actionLabel="Add Anime"
                   onAction={() => setIsAddOpen(true)}
                 />
 
@@ -402,9 +445,9 @@ export default function DashboardPage() {
                   <div className="flex items-center space-x-2 font-mono text-xs text-kage-text-muted border-b border-kage-border pb-3">
                     <Sparkles className="h-3.5 w-3.5 text-white" />
                     <span className="font-bold text-white uppercase">
-                      One-Click Archival Starters
+                      Popular Classics to Start With
                     </span>
-                    <span className="hidden sm:inline">— Populate your library with verified classics</span>
+                    <span className="hidden sm:inline">— Quickly add fan-favorite shows to your list</span>
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -452,7 +495,7 @@ export default function DashboardPage() {
                 <div className="flex items-center space-x-2">
                   <Star className="h-4 w-4 fill-white text-white" />
                   <h2 className="text-sm font-bold tracking-wider text-white uppercase">
-                    Personal Favorites
+                    My Favorites
                   </h2>
                   <span className="font-mono text-xs text-kage-text-muted">
                     ({stats.favorite_titles.length})
@@ -462,7 +505,7 @@ export default function DashboardPage() {
                   href="/collection?is_favorite=true"
                   className="flex items-center space-x-1 text-xs text-kage-text-muted hover:text-white font-mono"
                 >
-                  <span>Filter collection by favorites</span>
+                  <span>View all favorites</span>
                   <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -488,14 +531,14 @@ export default function DashboardPage() {
                 <div className="flex items-center space-x-2">
                   <Compass className="h-4 w-4 text-white" />
                   <h2 className="text-sm font-bold tracking-wider text-white uppercase">
-                    Recently Updated Entries
+                    Recently Updated
                   </h2>
                 </div>
                 <Link
                   href="/collection?sort_by=updated_at&sort_order=desc"
                   className="flex items-center space-x-1 text-xs text-kage-text-muted hover:text-white font-mono"
                 >
-                  <span>Full Collection</span>
+                  <span>View all</span>
                   <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -546,6 +589,13 @@ export default function DashboardPage() {
         onClose={() => setSelectedAnime(null)}
         onAnimeUpdated={handleAnimeUpdated}
         onAnimeDeleted={handleAnimeDeleted}
+      />
+
+      {/* Smart Import Wizard Modal */}
+      <ImportWizardModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImportComplete={fetchDashboardData}
       />
     </div>
   );

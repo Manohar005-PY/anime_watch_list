@@ -143,13 +143,13 @@ export default function SettingsPage() {
           {/* Header */}
           <div className="border-b border-kage-border pb-6">
             <span className="font-mono text-[10px] tracking-widest text-kage-text-muted uppercase">
-              PREFERENCES // ACCOUNT
+              SETTINGS
             </span>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-white uppercase">
-              System Settings
+              Settings
             </h1>
             <p className="mt-1 text-xs text-kage-text-secondary">
-              Configure interface motion, security credentials, data exports, and account lifecycle.
+              Change your layout, animations, password, or download your data.
             </p>
           </div>
 
@@ -158,7 +158,7 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-2 border-b border-kage-border pb-3">
               <Sliders className="h-4 w-4 text-white" />
               <h2 className="text-sm font-semibold tracking-wider text-white uppercase">
-                Interface & Motion Design
+                Display & Animations
               </h2>
             </div>
 
@@ -173,7 +173,7 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
-                    Default Collection View
+                    Default View
                   </label>
                   <select
                     value={displayMode}
@@ -187,7 +187,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
-                    Monochrome Surface Theme
+                    Theme Color
                   </label>
                   <select
                     value={theme}
@@ -217,11 +217,10 @@ export default function SettingsPage() {
                     htmlFor="reduceMotionPref"
                     className="font-mono text-xs font-semibold text-white cursor-pointer select-none"
                   >
-                    Reduce Motion Mode
+                    Reduced Animations
                   </label>
                   <p className="mt-1 text-xs text-kage-text-muted">
-                    Disables smooth transitions, hover scalings, parallax, and timeline animations in
-                    compliance with WCAG 2.2 AA accessibility standards.
+                    Turns off transitions and animations if you prefer a simpler, static feel.
                   </p>
                 </div>
               </div>
@@ -230,7 +229,7 @@ export default function SettingsPage() {
                 type="submit"
                 className="border border-kage-text-primary bg-kage-text-primary px-4 py-2 text-xs font-semibold tracking-wider text-kage-bg hover:opacity-90 active:scale-95 transition-transform"
               >
-                Save Interface Preferences
+                Save Preferences
               </button>
             </form>
           </section>
@@ -315,15 +314,13 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-2 border-b border-kage-border pb-3">
               <Download className="h-4 w-4 text-white" />
               <h2 className="text-sm font-semibold tracking-wider text-white uppercase">
-                Personal Data Export & Privacy
+                Download Your Data & Privacy
               </h2>
             </div>
 
             <div className="mt-4 space-y-4">
               <p className="text-xs text-kage-text-secondary leading-relaxed">
-                You own 100% of your viewing data. You can download a complete, structured JSON
-                archive containing all anime entries, ratings, progress history, notes, and
-                preferences at any time.
+                Your data is yours. Download a backup copy of your entire anime list, notes, ratings, and progress anytime.
               </p>
 
               <div className="flex items-center space-x-4">
@@ -333,7 +330,7 @@ export default function SettingsPage() {
                   className="flex items-center space-x-2 border border-kage-border bg-kage-bg px-4 py-2 text-xs font-semibold tracking-wider text-white hover:border-kage-border-focus active:scale-95 transition-transform disabled:opacity-50"
                 >
                   <Download className="h-3.5 w-3.5" />
-                  <span>{exportLoading ? "Generating Export..." : "Download JSON Export"}</span>
+                  <span>{exportLoading ? "Generating Export..." : "Download Data (JSON)"}</span>
                 </button>
               </div>
 
@@ -341,24 +338,22 @@ export default function SettingsPage() {
               <div className="border-t border-kage-border/80 pt-4 mt-6">
                 <div className="flex items-center space-x-2 text-xs font-semibold text-white mb-2">
                   <Shield className="h-4 w-4" />
-                  <span>Privacy Notice & Threat Model Summary</span>
+                  <span>How we protect your privacy</span>
                 </div>
                 <ul className="list-disc pl-5 space-y-1 text-xs text-kage-text-muted leading-relaxed">
                   <li>
-                    <strong>Data Stored:</strong> Account credentials (Argon2id hash), anime titles,
-                    episode progress, personal ratings, and notes.
+                    <strong>What&apos;s saved:</strong> Your login details (safely hashed), anime list,
+                    episode progress, ratings, and notes.
                   </li>
                   <li>
-                    <strong>Zero Third-Party Tracking:</strong> No tracking pixels, ad networks, or
-                    social telemetry libraries are loaded.
+                    <strong>No tracking or ads:</strong> We don&apos;t use tracking cookies, ads, or
+                    analytics trackers.
                   </li>
                   <li>
-                    <strong>Session Security:</strong> Authenticated using opaque cryptographically
-                    secure tokens stored in HttpOnly, SameSite=Lax cookies.
+                    <strong>Secure login:</strong> Your session is protected by secure, encrypted cookies.
                   </li>
                   <li>
-                    <strong>Isolation:</strong> All read and write queries are strictly scoped on the
-                    server by authenticated user ID.
+                    <strong>Private list:</strong> Only you can view or edit your personal collection.
                   </li>
                 </ul>
               </div>
@@ -370,22 +365,21 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-2 border-b border-red-500/20 pb-3">
               <Trash2 className="h-4 w-4 text-red-400" />
               <h2 className="text-sm font-semibold tracking-wider text-red-200 uppercase">
-                Danger Zone: Delete Account
+                Delete Account
               </h2>
             </div>
 
             <div className="mt-4 space-y-3">
               <p className="text-xs text-red-300 leading-relaxed">
                 Deleting your account will permanently delete all your registered anime titles,
-                watched progress, ratings, personal notes, and sessions. This operation is
-                irreversible.
+                watched progress, ratings, personal notes, and sessions. This operation cannot be undone.
               </p>
 
               <button
                 onClick={() => setShowDeleteModal(true)}
                 className="border border-red-500/50 bg-red-950/40 px-4 py-2 text-xs font-semibold tracking-wider text-red-200 hover:bg-red-900/60 transition-colors"
               >
-                Delete Account & Purge Data
+                Delete My Account
               </button>
             </div>
           </section>
@@ -439,7 +433,7 @@ export default function SettingsPage() {
                 disabled={deleteLoading || deleteConfirmText.toLowerCase() !== "delete my account"}
                 className="border border-red-500 bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-40"
               >
-                {deleteLoading ? "Purging..." : "Permanently Delete"}
+                {deleteLoading ? "Deleting..." : "Permanently Delete"}
               </button>
             </div>
           </div>
