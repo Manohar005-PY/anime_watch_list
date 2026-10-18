@@ -101,18 +101,58 @@ function CollectionContent() {
   }, [user, authLoading, router, fetchAnime]);
 
   const handleIncrementProgress = async (anime: AnimeEntry) => {
+    const prevList = animeList;
+    const nextEpisode = anime.watched_episodes + 1;
+    const isNowCompleted = !!anime.total_episodes && nextEpisode >= anime.total_episodes;
+
+    // Apply optimistic update immediately
+    setAnimeList((prev) =>
+      prev.map((item) =>
+        item.id === anime.id
+          ? {
+              ...item,
+              watched_episodes: nextEpisode,
+              status: isNowCompleted ? "COMPLETED" : item.status,
+            }
+          : item
+      )
+    );
+    if (selectedAnime?.id === anime.id) {
+      setSelectedAnime({
+        ...selectedAnime,
+        watched_episodes: nextEpisode,
+        status: isNowCompleted ? "COMPLETED" : selectedAnime.status,
+      });
+    }
+
     try {
-      const updated = await animeApi.updateProgress(anime.id, anime.watched_episodes + 1);
+      const updated = await animeApi.updateProgress(anime.id, nextEpisode);
       setAnimeList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
       if (selectedAnime?.id === anime.id) {
         setSelectedAnime(updated);
       }
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to update progress");
+      // Rollback on failure
+      setAnimeList(prevList);
+      if (selectedAnime?.id === anime.id) {
+        setSelectedAnime(anime);
+      }
+      alert(err instanceof Error ? err.message : "Failed to update progress. Changes restored.");
     }
   };
 
   const handleToggleFavorite = async (anime: AnimeEntry) => {
+    const prevList = animeList;
+    const optimisticVal = !anime.is_favorite;
+
+    // Apply optimistic update immediately
+    setAnimeList((prev) =>
+      prev.map((item) => (item.id === anime.id ? { ...item, is_favorite: optimisticVal } : item))
+    );
+    if (selectedAnime?.id === anime.id) {
+      setSelectedAnime({ ...selectedAnime, is_favorite: optimisticVal });
+    }
+
     try {
       const updated = await animeApi.toggleFavorite(anime.id);
       setAnimeList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
@@ -120,7 +160,12 @@ function CollectionContent() {
         setSelectedAnime(updated);
       }
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to toggle favorite");
+      // Rollback on failure
+      setAnimeList(prevList);
+      if (selectedAnime?.id === anime.id) {
+        setSelectedAnime(anime);
+      }
+      alert(err instanceof Error ? err.message : "Failed to toggle favorite. Changes restored.");
     }
   };
 

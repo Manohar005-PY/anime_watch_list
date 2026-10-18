@@ -81,7 +81,7 @@ export function EditorialShowcaseGallery() {
                 {/* Index & Year Stamp */}
                 <div className="absolute top-2 left-2 z-10 flex items-center space-x-1.5 border border-black/80 bg-black/80 px-2 py-0.5 font-mono text-[9px] text-white backdrop-blur-xs">
                   <span>#{String(idx + 1).padStart(2, "0")}</span>
-                  <span>//</span>
+                  <span>{"//"}</span>
                   <span>{anime.year}</span>
                 </div>
 

@@ -26,7 +26,12 @@ export function AnimeQuoteCard({
   useEffect(() => {
     setMounted(true);
     if (!providedQuote) {
-      setQuote(getRandomAnimeQuote());
+      try {
+        setQuote(getRandomAnimeQuote());
+      } catch (err) {
+        console.error("Failed to load anime quote:", err);
+        setQuote(null);
+      }
     }
   }, [providedQuote]);
 
@@ -46,7 +51,7 @@ export function AnimeQuoteCard({
     return (
       <div className={`border-l-2 border-white pl-3 py-1 font-mono text-xs text-neutral-300 ${className}`}>
         <p className="italic text-white">&ldquo;{quote.quote}&rdquo;</p>
-        <p className="mt-1 text-[11px] text-neutral-400">
+        <p className="mt-1 text-xs text-neutral-400">
           — {quote.character}, <span className="text-neutral-500">{quote.anime}</span>
         </p>
       </div>
@@ -90,7 +95,7 @@ export function AnimeQuoteCard({
             VOICES OF CINEMA
           </span>
         </div>
-        <span className="text-[11px] text-neutral-500 uppercase">{quote.originalLanguage}</span>
+        <span className="text-xs text-neutral-500 uppercase">{quote.originalLanguage}</span>
       </div>
 
       {/* Primary Quotation */}
@@ -114,11 +119,11 @@ export function AnimeQuoteCard({
           <span className="mx-2 text-kage-text-muted">/</span>
           <span className="text-neutral-300 font-medium">{quote.anime}</span>
         </div>
-        <span className="text-[11px] text-neutral-500">{quote.sourceReference}</span>
+        <span className="text-xs text-neutral-500">{quote.sourceReference}</span>
       </div>
 
       {showSourceNote && quote.translationNote && (
-        <p className="mt-3 text-[11px] font-mono text-neutral-500 leading-normal border-t border-neutral-900 pt-2">
+        <p className="mt-3 text-xs font-mono text-neutral-500 leading-normal border-t border-neutral-900 pt-2">
           Note: {quote.translationNote}
         </p>
       )}

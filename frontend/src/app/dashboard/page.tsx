@@ -70,26 +70,62 @@ export default function DashboardPage() {
   }, [user, authLoading, router, fetchDashboardData]);
 
   const handleIncrementProgress = async (anime: AnimeEntry) => {
-    try {
-      const updated = await animeApi.updateProgress(anime.id, anime.watched_episodes + 1);
-      setWatchingList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
-      setStats((prev) =>
-        prev
-          ? {
-              ...prev,
-              total_episodes_watched: prev.total_episodes_watched + 1,
-            }
-          : null
+    // 1. Snapshot previous state for failure recovery
+    const prevList = watchingList;
+    const prevStats = stats;
+    const nextEpisode = anime.watched_episodes + 1;
+    const isNowCompleted = !!anime.total_episodes && nextEpisode >= anime.total_episodes;
+
+    // 2. Apply optimistic updates immediately
+    if (isNowCompleted) {
+      setWatchingList((prev) => prev.filter((item) => item.id !== anime.id));
+    } else {
+      setWatchingList((prev) =>
+        prev.map((item) =>
+          item.id === anime.id ? { ...item, watched_episodes: nextEpisode } : item
+        )
       );
+    }
+    setStats((prev) =>
+      prev
+        ? {
+            ...prev,
+            total_episodes_watched: prev.total_episodes_watched + 1,
+            completed_count: isNowCompleted ? prev.completed_count + 1 : prev.completed_count,
+            watching_count: isNowCompleted ? Math.max(0, prev.watching_count - 1) : prev.watching_count,
+          }
+        : null
+    );
+
+    // 3. Dispatch network request with rollback recovery
+    try {
+      const updated = await animeApi.updateProgress(anime.id, nextEpisode);
+      if (!isNowCompleted) {
+        setWatchingList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
+      }
       if (selectedAnime?.id === anime.id) {
         setSelectedAnime(updated);
       }
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to update progress");
+      // Rollback to prior snapshot
+      setWatchingList(prevList);
+      setStats(prevStats);
+      alert(err instanceof Error ? err.message : "Failed to update progress. Changes restored.");
     }
   };
 
   const handleToggleFavorite = async (anime: AnimeEntry) => {
+    const prevList = watchingList;
+    const optimisticVal = !anime.is_favorite;
+
+    // Apply optimistic state
+    setWatchingList((prev) =>
+      prev.map((item) => (item.id === anime.id ? { ...item, is_favorite: optimisticVal } : item))
+    );
+    if (selectedAnime?.id === anime.id) {
+      setSelectedAnime({ ...selectedAnime, is_favorite: optimisticVal });
+    }
+
     try {
       const updated = await animeApi.toggleFavorite(anime.id);
       setWatchingList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
@@ -97,7 +133,12 @@ export default function DashboardPage() {
         setSelectedAnime(updated);
       }
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to toggle favorite");
+      // Rollback on failure
+      setWatchingList(prevList);
+      if (selectedAnime?.id === anime.id) {
+        setSelectedAnime(anime);
+      }
+      alert(err instanceof Error ? err.message : "Failed to toggle favorite. Changes restored.");
     }
   };
 

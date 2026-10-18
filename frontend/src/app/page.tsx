@@ -383,7 +383,7 @@ export default function LandingPage() {
           <div className="pointer-events-none absolute inset-0 manga-screentone-dense opacity-20" />
           <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
             <span className="font-mono text-xs tracking-widest text-neutral-400 uppercase">
-              // 映画的・個人用アニメ目録 //
+              {"// 映画的・個人用アニメ目録 //"}
             </span>
             <h2 className="mt-4 text-3xl sm:text-6xl font-extrabold tracking-tighter text-white uppercase leading-[0.95]">
               Start your anime watchlist today.
