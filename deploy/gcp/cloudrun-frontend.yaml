@@ -12,7 +12,7 @@ spec:
         autoscaling.knative.dev/maxScale: "6"
         run.googleapis.com/execution-environment: gen2
     spec:
-      serviceAccountName: "kage-cloudrun-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+      serviceAccountName: "kage-frontend-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
       containerConcurrency: 80
       timeoutSeconds: 300
       containers:
@@ -28,8 +28,14 @@ spec:
               value: "production"
             - name: NEXT_PUBLIC_API_URL
               value: "/api/v1"
+            # Target backend Cloud Run service URL in staging/production
             - name: BACKEND_INTERNAL_URL
-              value: "https://kage-api-${GCP_PROJECT_ID}.a.run.app"
+              value: "${BACKEND_SERVICE_URL}"
+            # Enable Google OIDC ID token generation via metadata server for private backend IAM invocation
+            - name: ENABLE_GCP_IAM_AUTH
+              value: "true"
+            - name: BACKEND_IAM_AUDIENCE
+              value: "${BACKEND_SERVICE_URL}"
           livenessProbe:
             httpGet:
               path: /

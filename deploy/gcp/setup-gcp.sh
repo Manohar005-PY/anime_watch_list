@@ -121,8 +121,24 @@ gcloud secrets add-iam-policy-binding "KAGE_DATABASE_URL" \
     --member="serviceAccount:${MIGRATION_SA_EMAIL}" \
     --role="roles/secretmanager.secretAccessor" || true
 
+echo "=== 8. Authorizing Frontend Identity for Service-to-Service IAM Invocation ==="
+# Allow the frontend service identity to invoke the private backend Cloud Run service
+gcloud run services add-iam-policy-binding kage-api \
+    --member="serviceAccount:${FRONTEND_SA_EMAIL}" \
+    --role="roles/run.invoker" \
+    --region="${REGION}" || true
+
+echo "=== 9. Cloud SQL Connection Monitoring & Safeguards ==="
+# IMPORTANT: Google Cloud documentation states that maxScale can be briefly exceeded during rolling deployments,
+# traffic spikes, or zone rebalancing. Do NOT treat 6 instances as a guaranteed hard cap.
+# The 27-connection reserve headroom is designed to absorb temporary burst instances without exhausting Cloud SQL.
+# Configure an alert policy in GCP Cloud Monitoring:
+# Metric: cloudsql.googleapis.com/database/postgresql/num_backends
+# Condition: threshold >= 80 connections (80% of 100 max) over a 1-minute rolling window.
+
 echo "=== Setup complete! ==="
 echo "Instance Connection Name: ${CONNECTION_NAME}"
 echo "Backend Runtime Service Account: ${BACKEND_SA_EMAIL}"
 echo "Migration Job Service Account: ${MIGRATION_SA_EMAIL}"
 echo "Frontend Service Account: ${FRONTEND_SA_EMAIL}"
+echo "Authorized Invoker: ${FRONTEND_SA_EMAIL} -> kage-api (roles/run.invoker)"

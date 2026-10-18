@@ -10,16 +10,21 @@ spec:
       annotations:
         autoscaling.knative.dev/minScale: "0"
         # Connection Budget & Pool Sizing:
-        # Cloud SQL max_connections = 100 (verify exact instance tier in GCP console).
-        # Dedicated Reserves: 5 system + 10 DBA/monitoring + 10 migrations/cron = 25 reserved.
-        # Max Available for Web Service pool = 75 connections ceiling.
+        # Cloud SQL max_connections = 100 (Tier db-custom-1-3840).
+        # Dedicated Reserves: 5 system/autovacuum + 10 DBA/monitoring + 10 migrations/cron = 25 reserved.
+        # Max Available for Web Service pool = 75 connections baseline.
         # Per container instance: 1 Uvicorn worker * (4 steady-state + 4 overflow) = 8 connections max.
-        # Max scale = 6 instances -> 6 * 8 = 48 peak connections (safe headroom of 27 connections / 36%).
+        # Target scale setting: 6 instances -> 6 * 8 = 48 steady peak connections.
+        # IMPORTANT: Google Cloud documentation explicitly notes that maxScale can be briefly exceeded
+        # during rolling deployments, rapid traffic surges, or zone rebalancing.
+        # The 27-connection reserve headroom (75 - 48 = 27 connections, 36% buffer) is specifically
+        # designed to absorb temporary burst instances beyond 6 without exhausting Cloud SQL limits.
+        # Active connection monitoring with alerting at 80% capacity is mandatory.
         autoscaling.knative.dev/maxScale: "6"
         run.googleapis.com/cloudsql-instances: "${GCP_PROJECT_ID}:${GCP_REGION}:${CLOUD_SQL_INSTANCE}"
         run.googleapis.com/execution-environment: gen2
     spec:
-      serviceAccountName: "kage-cloudrun-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+      serviceAccountName: "kage-backend-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
       # Concurrency: set conservatively to 16 (matching ~2x database pool capacity of 8 per container).
       # Prevents request queue saturation and 15s pool timeouts under concurrent database load.
       containerConcurrency: 16

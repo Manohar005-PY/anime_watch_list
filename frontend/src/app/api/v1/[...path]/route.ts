@@ -10,6 +10,45 @@ function getBackendBaseUrl(): string {
   ).replace(/\/$/, "");
 }
 
+// In-memory cache for Google Cloud Run OIDC ID token
+let cachedIdToken: { token: string; expiresAt: number } | null = null;
+
+async function getGcpIdToken(audience: string): Promise<string | null> {
+  const now = Date.now();
+  // Return cached token if valid for at least 5 more minutes
+  if (cachedIdToken && cachedIdToken.expiresAt > now + 300_000) {
+    return cachedIdToken.token;
+  }
+
+  try {
+    // Query Google Cloud instance metadata server
+    const metadataUrl = `http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience=${encodeURIComponent(audience)}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1500);
+
+    const res = await fetch(metadataUrl, {
+      headers: { "Metadata-Flavor": "Google" },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (res.ok) {
+      const token = (await res.text()).trim();
+      if (token) {
+        // Cache token for 50 minutes (Google ID tokens are valid for 60 minutes)
+        cachedIdToken = {
+          token,
+          expiresAt: now + 50 * 60 * 1000,
+        };
+        return token;
+      }
+    }
+  } catch {
+    // Not running on GCP or metadata server unreachable (e.g. local dev, docker-compose)
+  }
+  return null;
+}
+
 async function proxyRequest(
   req: NextRequest,
   context: { params: Promise<{ path: string[] }> }
@@ -29,6 +68,25 @@ async function proxyRequest(
       forwardHeaders.set(key, val);
     }
   });
+
+  // Service-to-Service IAM Authentication for Private Cloud Run Backend:
+  // When target is a remote HTTPS Cloud Run service or ENABLE_GCP_IAM_AUTH is true,
+  // obtain an OIDC ID token from the GCP metadata server with the backend URL as audience.
+  const isRemoteHttps = backendUrl.startsWith("https://");
+  const isIamAuthExplicit = process.env.ENABLE_GCP_IAM_AUTH === "true";
+
+  if (isRemoteHttps || isIamAuthExplicit) {
+    const backendAudience = process.env.BACKEND_IAM_AUDIENCE || backendUrl;
+    const idToken = await getGcpIdToken(backendAudience);
+    if (idToken) {
+      // Cloud Run natively evaluates X-Serverless-Authorization for IAM invocation
+      // while passing the application Authorization header through to the container
+      forwardHeaders.set("X-Serverless-Authorization", `Bearer ${idToken}`);
+      if (!forwardHeaders.has("Authorization")) {
+        forwardHeaders.set("Authorization", `Bearer ${idToken}`);
+      }
+    }
+  }
 
   // Ensure Origin and Referer are set accurately for CSRF/origin validation
   let clientOrigin = req.headers.get("origin");

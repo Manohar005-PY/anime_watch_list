@@ -120,6 +120,9 @@ jobs:
 
       - name: Deploy Frontend Service to Cloud Run
         run: |
+          # Retrieve real private backend Cloud Run URL and pass to frontend service
+          BACKEND_URL=$(gcloud run services describe kage-api --region=${{ env.REGION }} --format='value(status.url)')
           gcloud run services update kage-web \
             --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/kage-frontend:${{ github.sha }} \
+            --update-env-vars=BACKEND_INTERNAL_URL="${BACKEND_URL}",ENABLE_GCP_IAM_AUTH="true",BACKEND_IAM_AUDIENCE="${BACKEND_URL}" \
             --region=${{ env.REGION }}
