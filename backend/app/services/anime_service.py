@@ -79,23 +79,25 @@ class AnimeService:
         order_fn = desc if sort_order.lower() == "desc" else asc
         query = query.order_by(order_fn(sort_column))
 
-        # Total count before pagination
-        all_results = query.all()
-        
-        # In-memory genre filter for universal SQLite and Postgres compatibility
+        # Efficient database pagination
         if genre_filter and genre_filter.strip():
+            # In-memory genre filter for universal SQLite and Postgres JSON array compatibility
+            all_results = query.all()
             g_target = genre_filter.strip().lower()
             filtered_results = [
                 e for e in all_results
                 if any(g.lower() == g_target for g in (e.genres or []))
             ]
+            total = len(filtered_results)
+            total_pages = math.ceil(total / page_size) if total > 0 else 0
+            offset = (page - 1) * page_size
+            paginated_items = filtered_results[offset : offset + page_size]
         else:
-            filtered_results = all_results
-
-        total = len(filtered_results)
-        total_pages = math.ceil(total / page_size) if total > 0 else 0
-        offset = (page - 1) * page_size
-        paginated_items = filtered_results[offset : offset + page_size]
+            # Native database COUNT and LIMIT/OFFSET avoiding full table load into memory
+            total = query.order_by(None).count()
+            total_pages = math.ceil(total / page_size) if total > 0 else 0
+            offset = (page - 1) * page_size
+            paginated_items = query.offset(offset).limit(page_size).all()
 
         return AnimeListResponse(
             items=[AnimeResponse.model_validate(item) for item in paginated_items],

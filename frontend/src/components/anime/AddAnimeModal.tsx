@@ -127,10 +127,10 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
           {/* Header */}
           <div className="flex items-center justify-between border-b border-kage-border pb-4">
             <div className="flex items-center space-x-2">
-              <span className="flex h-5 w-5 items-center justify-center border border-kage-text-primary text-[10px] font-mono">
+              <span className="flex h-5 w-5 items-center justify-center border border-kage-text-primary text-xs font-mono">
                 +
               </span>
-              <h2 className="text-sm font-semibold tracking-wider text-kage-text-primary uppercase">
+              <h2 className="text-base font-semibold tracking-wider text-kage-text-primary uppercase">
                 Add Anime to My List
               </h2>
             </div>
@@ -139,22 +139,22 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
               className="p-1 text-kage-text-muted hover:text-kage-text-primary"
               aria-label="Close modal"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Quick Fill Preset Strip */}
           <div className="mt-3.5 border-b border-kage-border pb-3">
-            <span className="block font-mono text-[9px] uppercase tracking-wider text-kage-text-muted mb-1.5">
+            <span className="block font-mono text-xs uppercase tracking-wider text-kage-text-muted mb-1.5">
               QUICK ADD POPULAR CLASSICS:
             </span>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {CURATED_CLASSICS.slice(0, 6).map((c) => (
                 <button
                   key={c.id}
                   type="button"
                   onClick={() => handleQuickFill(c)}
-                  className="border border-kage-border bg-kage-bg px-2 py-0.5 font-mono text-[10px] text-kage-text-secondary hover:border-white hover:text-white transition-colors"
+                  className="border border-kage-border bg-kage-bg px-2.5 py-1 font-mono text-xs text-kage-text-secondary hover:border-white hover:text-white transition-colors"
                 >
                   + {c.title}
                 </button>
@@ -163,7 +163,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
           </div>
 
           {error && (
-            <div className="mt-4 flex items-start space-x-2 border border-red-500/30 bg-red-950/20 p-3 text-xs text-red-200">
+            <div className="mt-4 flex items-start space-x-2.5 border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-200">
               <AlertCircle className="h-4 w-4 shrink-0 text-red-400 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -172,7 +172,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
           <form onSubmit={handleSubmit} className="mt-4 space-y-4">
             {/* Title */}
             <div>
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+              <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                 Title *
               </label>
               <input
@@ -181,13 +181,13 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Neon Genesis Evangelion"
-                className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
+                className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
               />
             </div>
 
             {/* Alternate Title */}
             <div>
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+              <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                 Alternate Title / Original Name
               </label>
               <input
@@ -195,20 +195,20 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                 value={alternateTitle}
                 onChange={(e) => setAlternateTitle(e.target.value)}
                 placeholder="e.g. 新世紀エヴァンゲリオン"
-                className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
+                className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
               />
             </div>
 
             {/* Status & Poster URL */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+                <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                   Status
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as AnimeStatus)}
-                  className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs text-kage-text-primary focus:border-kage-border-focus focus:outline-none"
+                  className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm text-kage-text-primary focus:border-kage-border-focus focus:outline-none"
                 >
                   <option value="WATCHING">Watching</option>
                   <option value="COMPLETED">Completed</option>
@@ -219,13 +219,13 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
               </div>
 
               <div>
-                <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+                <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                   Rating (1 to 10)
                 </label>
                 <select
                   value={rating}
                   onChange={(e) => setRating(e.target.value)}
-                  className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs text-kage-text-primary focus:border-kage-border-focus focus:outline-none"
+                  className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm text-kage-text-primary focus:border-kage-border-focus focus:outline-none"
                 >
                   <option value="">No Rating</option>
                   {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((r) => (
@@ -240,7 +240,7 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
             {/* Episode tracking */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+                <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                   Episodes Watched
                 </label>
                 <input
@@ -248,12 +248,12 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                   min="0"
                   value={watchedEpisodes}
                   onChange={(e) => setWatchedEpisodes(e.target.value)}
-                  className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs font-mono text-kage-text-primary focus:border-kage-border-focus focus:outline-none"
+                  className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm font-mono text-kage-text-primary focus:border-kage-border-focus focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+                <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                   Total Episodes (if known)
                 </label>
                 <input
@@ -262,14 +262,14 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                   value={totalEpisodes}
                   onChange={(e) => setTotalEpisodes(e.target.value)}
                   placeholder="e.g. 26"
-                  className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs font-mono text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
+                  className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm font-mono text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Poster URL (HTTPS required, client-safe) */}
             <div>
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+              <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                 Poster Image URL
               </label>
               <input
@@ -277,13 +277,13 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                 value={posterUrl}
                 onChange={(e) => setPosterUrl(e.target.value)}
                 placeholder="https://example.com/poster.jpg"
-                className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
+                className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
               />
             </div>
 
             {/* Genres */}
             <div>
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+              <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                 Genres (comma separated)
               </label>
               <input
@@ -291,13 +291,13 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                 value={genresText}
                 onChange={(e) => setGenresText(e.target.value)}
                 placeholder="Sci-Fi, Psychological, Mecha"
-                className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
+                className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-kage-text-secondary">
+              <label className="block font-mono text-xs sm:text-sm uppercase tracking-wider text-kage-text-secondary">
                 My Notes
               </label>
               <textarea
@@ -305,20 +305,20 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Thoughts, favorite episodes, or notes..."
-                className="mt-1 w-full border border-kage-border bg-kage-bg px-3 py-2 text-xs text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none resize-none"
+                className="mt-1 w-full border border-kage-border bg-kage-bg px-3.5 py-2.5 text-sm text-kage-text-primary placeholder:text-kage-text-muted focus:border-kage-border-focus focus:outline-none resize-none"
               />
             </div>
 
             {/* Favorite checkbox */}
-            <div className="flex items-center space-x-2 pt-1">
+            <div className="flex items-center space-x-2.5 pt-1">
               <input
                 type="checkbox"
                 id="isFavorite"
                 checked={isFavorite}
                 onChange={(e) => setIsFavorite(e.target.checked)}
-                className="h-4 w-4 rounded border-kage-border bg-kage-bg text-white focus:ring-0"
+                className="h-4 w-4 rounded border-kage-border bg-kage-bg text-white focus:ring-0 cursor-pointer"
               />
-              <label htmlFor="isFavorite" className="text-xs text-kage-text-secondary select-none cursor-pointer">
+              <label htmlFor="isFavorite" className="text-sm text-kage-text-secondary select-none cursor-pointer">
                 Add to favorites ★
               </label>
             </div>
@@ -328,14 +328,14 @@ export function AddAnimeModal({ isOpen, onClose, onAnimeAdded }: AddAnimeModalPr
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs tracking-wider text-kage-text-muted hover:text-kage-text-primary"
+                className="px-4 py-2 text-sm tracking-wider text-kage-text-muted hover:text-kage-text-primary"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="border border-kage-text-primary bg-kage-text-primary px-5 py-2 text-xs font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95 disabled:opacity-50"
+                className="border border-kage-text-primary bg-kage-text-primary px-5 py-2.5 text-sm font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95 disabled:opacity-50"
               >
                 {loading ? "Adding..." : "Add to My List"}
               </button>

@@ -19,6 +19,7 @@ import { useAuth } from "@/lib/auth-context";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { EditorialShowcaseGallery } from "@/components/landing/EditorialShowcaseGallery";
 import { InteractiveLibraryDemo } from "@/components/landing/InteractiveLibraryDemo";
+import { AnimeQuoteCard } from "@/components/ui/AnimeQuoteCard";
 import { CURATED_CLASSICS } from "@/lib/curated-anime";
 import {
   staggerContainerVariants,
@@ -312,19 +313,19 @@ export default function LandingPage() {
               {/* Pillar 1 */}
               <div className="manga-panel p-8 relative flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between font-mono text-[11px] text-kage-text-muted pb-4 border-b border-kage-border">
+                  <div className="flex items-center justify-between font-mono text-xs text-kage-text-muted pb-4 border-b border-kage-border">
                     <span>PILLAR // 01</span>
                     <Lock className="h-4 w-4 text-white" />
                   </div>
-                  <h3 className="mt-6 text-lg font-bold text-white uppercase tracking-tight">
+                  <h3 className="mt-6 text-lg sm:text-xl font-bold text-white uppercase tracking-tight">
                     100% Private
                   </h3>
-                  <p className="mt-3 text-xs sm:text-sm text-kage-text-secondary leading-relaxed">
+                  <p className="mt-3 text-sm sm:text-base text-kage-text-secondary leading-relaxed">
                     No public profiles, no feeds, and no unwanted followers. Your notes, ratings,
                     and watch history are strictly for your eyes only.
                   </p>
                 </div>
-                <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-[10px] text-kage-text-muted">
+                <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-xs text-kage-text-muted">
                   SECURE SESSIONS • FULL PRIVACY
                 </div>
               </div>
@@ -332,19 +333,19 @@ export default function LandingPage() {
               {/* Pillar 2 */}
               <div className="manga-panel p-8 relative flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between font-mono text-[11px] text-kage-text-muted pb-4 border-b border-kage-border">
+                  <div className="flex items-center justify-between font-mono text-xs text-kage-text-muted pb-4 border-b border-kage-border">
                     <span>PILLAR // 02</span>
                     <Sliders className="h-4 w-4 text-white" />
                   </div>
-                  <h3 className="mt-6 text-lg font-bold text-white uppercase tracking-tight">
+                  <h3 className="mt-6 text-lg sm:text-xl font-bold text-white uppercase tracking-tight">
                     Simple Episode Tracking
                   </h3>
-                  <p className="mt-3 text-xs sm:text-sm text-kage-text-secondary leading-relaxed">
+                  <p className="mt-3 text-sm sm:text-base text-kage-text-secondary leading-relaxed">
                     One-click episode counter with built-in limit checks so you never accidentally
                     overshoot the episode count.
                   </p>
                 </div>
-                <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-[10px] text-kage-text-muted">
+                <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-xs text-kage-text-muted">
                   ONE-CLICK TRACKING • INSTANT SYNC
                 </div>
               </div>
@@ -352,22 +353,27 @@ export default function LandingPage() {
               {/* Pillar 3 */}
               <div className="manga-panel p-8 relative flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between font-mono text-[11px] text-kage-text-muted pb-4 border-b border-kage-border">
+                  <div className="flex items-center justify-between font-mono text-xs text-kage-text-muted pb-4 border-b border-kage-border">
                     <span>PILLAR // 03</span>
                     <BarChart2 className="h-4 w-4 text-white" />
                   </div>
-                  <h3 className="mt-6 text-lg font-bold text-white uppercase tracking-tight">
+                  <h3 className="mt-6 text-lg sm:text-xl font-bold text-white uppercase tracking-tight">
                     Honest Stats & Habits
                   </h3>
-                  <p className="mt-3 text-xs sm:text-sm text-kage-text-secondary leading-relaxed">
+                  <p className="mt-3 text-sm sm:text-base text-kage-text-secondary leading-relaxed">
                     See real stats on how many hours you&apos;ve spent watching, your favorite
                     genres, and your rating habits.
                   </p>
                 </div>
-                <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-[10px] text-kage-text-muted">
+                <div className="mt-8 border-t border-kage-border/80 pt-4 font-mono text-xs text-kage-text-muted">
                   REAL STATS • NO ADS OR TRACKERS
                 </div>
               </div>
+            </div>
+
+            {/* Atmospheric Editorial Anime Quotation Banner */}
+            <div className="mt-14 max-w-2xl mx-auto">
+              <AnimeQuoteCard variant="panel" />
             </div>
           </div>
         </section>
@@ -382,20 +388,20 @@ export default function LandingPage() {
             <h2 className="mt-4 text-3xl sm:text-6xl font-extrabold tracking-tighter text-white uppercase leading-[0.95]">
               Start your anime watchlist today.
             </h2>
-            <p className="mx-auto mt-6 max-w-xl text-sm sm:text-base text-kage-text-secondary">
+            <p className="mx-auto mt-6 max-w-xl text-base sm:text-lg text-kage-text-secondary leading-relaxed">
               Create your clean, distraction-free anime collection in seconds. Free forever.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href={user ? "/dashboard" : "/register"}
-                className="border border-white bg-white px-8 py-4 text-xs sm:text-sm font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 shadow-tactile"
+                className="border border-white bg-white px-8 py-4 text-sm sm:text-base font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 shadow-tactile"
               >
                 {user ? "OPEN YOUR DASHBOARD" : "CREATE FREE ACCOUNT"}
               </Link>
               <Link
                 href={user ? "/collection" : "/login"}
-                className="border border-kage-border bg-kage-surface px-8 py-4 text-xs sm:text-sm font-semibold tracking-wider text-white hover:border-kage-border-focus hover:bg-kage-surface-raised transition-all"
+                className="border border-kage-border bg-kage-surface px-8 py-4 text-sm sm:text-base font-semibold tracking-wider text-white hover:border-kage-border-focus hover:bg-kage-surface-raised transition-all"
               >
                 {user ? "VIEW COLLECTION" : "LOG IN"}
               </Link>
@@ -405,10 +411,10 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-kage-border py-12 bg-kage-bg font-mono text-xs text-kage-text-muted">
+      <footer className="border-t border-kage-border py-12 bg-kage-bg font-mono text-xs sm:text-sm text-kage-text-muted">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between px-4 sm:flex-row sm:px-6 lg:px-8 gap-4">
           <div className="flex items-center space-x-3">
-            <span className="flex h-6 w-6 items-center justify-center border border-white text-white font-bold text-[10px]">
+            <span className="flex h-6 w-6 items-center justify-center border border-white text-white font-bold text-xs">
               影
             </span>
             <span className="font-bold text-white tracking-widest">KAGE</span>
@@ -416,7 +422,7 @@ export default function LandingPage() {
             <span>Cinematic Personal Anime Library</span>
           </div>
 
-          <div className="flex items-center space-x-6 text-[11px]">
+          <div className="flex items-center space-x-6 text-xs text-neutral-400">
             <span>PostgreSQL 16 Engine</span>
             <span>•</span>
             <span>Argon2id Auth</span>

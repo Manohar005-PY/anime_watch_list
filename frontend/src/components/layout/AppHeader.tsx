@@ -68,13 +68,13 @@ export function AppHeader({ onOpenAddModal, onOpenImportModal }: AppHeaderProps)
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`relative flex items-center space-x-2 px-3 py-1.5 text-xs font-medium tracking-wider transition-colors ${
+                    className={`relative flex items-center space-x-2 px-3.5 py-2 text-sm sm:text-kage-nav font-medium tracking-wider transition-colors ${
                       isActive
-                        ? "text-kage-text-primary"
+                        ? "text-kage-text-primary font-semibold"
                         : "text-kage-text-muted hover:text-kage-text-secondary"
                     }`}
                   >
-                    <Icon className="h-3.5 w-3.5" />
+                    <Icon className="h-4 w-4" />
                     <span>{item.name}</span>
                     {isActive && (
                       <motion.div
@@ -101,14 +101,14 @@ export function AppHeader({ onOpenAddModal, onOpenImportModal }: AppHeaderProps)
               <button
                 onClick={handleToggleReducedMotion}
                 title={reduceMotion ? "Reduced Motion: Enabled" : "Reduced Motion: Disabled"}
-                className={`hidden lg:flex items-center space-x-1.5 border px-2.5 py-1 text-[11px] font-mono tracking-tight transition-colors ${
+                className={`hidden lg:flex items-center space-x-1.5 border px-3 py-1.5 text-xs font-mono tracking-tight transition-colors ${
                   reduceMotion
                     ? "border-kage-text-primary bg-kage-surface-raised text-kage-text-primary"
                     : "border-kage-border text-kage-text-muted hover:border-kage-border-focus hover:text-kage-text-secondary"
                 }`}
                 aria-label="Toggle reduced motion preference"
               >
-                <Sliders className="h-3 w-3" />
+                <Sliders className="h-3.5 w-3.5" />
                 <span>{reduceMotion ? "Motion: Off" : "Motion: On"}</span>
               </button>
 
@@ -116,9 +116,9 @@ export function AppHeader({ onOpenAddModal, onOpenImportModal }: AppHeaderProps)
               {onOpenImportModal && (
                 <button
                   onClick={onOpenImportModal}
-                  className="hidden sm:flex items-center space-x-1.5 border border-kage-border bg-kage-surface px-3 py-1.5 text-xs font-medium tracking-wider text-kage-text-primary transition-colors hover:border-white active:scale-95"
+                  className="hidden sm:flex items-center space-x-1.5 border border-kage-border bg-kage-surface px-3.5 py-1.5 text-xs sm:text-sm font-semibold tracking-wider text-kage-text-primary transition-colors hover:border-white active:scale-95"
                 >
-                  <UploadCloud className="h-3.5 w-3.5" />
+                  <UploadCloud className="h-4 w-4" />
                   <span>Import</span>
                 </button>
               )}
@@ -127,16 +127,16 @@ export function AppHeader({ onOpenAddModal, onOpenImportModal }: AppHeaderProps)
               {onOpenAddModal && (
                 <button
                   onClick={onOpenAddModal}
-                  className="flex items-center space-x-1.5 border border-kage-text-primary bg-kage-text-primary px-3 py-1.5 text-xs font-medium tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95"
+                  className="flex items-center space-x-1.5 border border-kage-text-primary bg-kage-text-primary px-3.5 py-1.5 text-xs sm:text-sm font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95 shadow-tactile"
                 >
-                  <Plus className="h-3.5 w-3.5" />
+                  <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">Add Anime</span>
                 </button>
               )}
 
               {/* User Email & Sign Out */}
               <div className="hidden items-center space-x-2 md:flex">
-                <span className="max-w-[140px] truncate font-mono text-[11px] text-kage-text-muted">
+                <span className="max-w-[150px] truncate font-mono text-xs text-kage-text-muted">
                   {user.display_name || user.email.split("@")[0]}
                 </span>
                 <button
@@ -162,13 +162,13 @@ export function AppHeader({ onOpenAddModal, onOpenImportModal }: AppHeaderProps)
             <div className="flex items-center space-x-3">
               <Link
                 href="/login"
-                className="px-3 py-1.5 text-xs font-medium tracking-wider text-kage-text-secondary transition-colors hover:text-kage-text-primary"
+                className="px-3.5 py-1.5 text-sm font-semibold tracking-wider text-kage-text-secondary transition-colors hover:text-kage-text-primary"
               >
                 Log In
               </Link>
               <Link
                 href="/register"
-                className="border border-kage-text-primary bg-kage-text-primary px-3 py-1.5 text-xs font-medium tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95"
+                className="border border-kage-text-primary bg-kage-text-primary px-4 py-1.5 text-sm font-bold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95 shadow-tactile"
               >
                 Sign Up
               </Link>

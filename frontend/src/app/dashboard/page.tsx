@@ -25,6 +25,7 @@ import { AnimeDetailModal } from "@/components/anime/AnimeDetailModal";
 import { ImportWizardModal } from "@/components/import/ImportWizardModal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProgressRing } from "@/components/ui/ProgressRing";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { CURATED_CLASSICS, CuratedAnime } from "@/lib/curated-anime";
 
 export default function DashboardPage() {
@@ -71,7 +72,15 @@ export default function DashboardPage() {
   const handleIncrementProgress = async (anime: AnimeEntry) => {
     try {
       const updated = await animeApi.updateProgress(anime.id, anime.watched_episodes + 1);
-      fetchDashboardData();
+      setWatchingList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
+      setStats((prev) =>
+        prev
+          ? {
+              ...prev,
+              total_episodes_watched: prev.total_episodes_watched + 1,
+            }
+          : null
+      );
       if (selectedAnime?.id === anime.id) {
         setSelectedAnime(updated);
       }
@@ -82,8 +91,11 @@ export default function DashboardPage() {
 
   const handleToggleFavorite = async (anime: AnimeEntry) => {
     try {
-      await animeApi.toggleFavorite(anime.id);
-      fetchDashboardData();
+      const updated = await animeApi.toggleFavorite(anime.id);
+      setWatchingList((prev) => prev.map((item) => (item.id === anime.id ? updated : item)));
+      if (selectedAnime?.id === anime.id) {
+        setSelectedAnime(updated);
+      }
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : "Failed to toggle favorite");
     }
@@ -141,8 +153,14 @@ export default function DashboardPage() {
 
   if (authLoading || (!user && loading)) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-kage-bg font-mono text-xs text-kage-text-muted">
-        Loading dashboard...
+      <div className="flex min-h-screen flex-col bg-kage-bg">
+        <AppHeader />
+        <main className="flex flex-1 items-center justify-center">
+          <LoadingScreen
+            message="Loading your dashboard..."
+            submessage="Preparing your watch queue and statistics"
+          />
+        </main>
       </div>
     );
   }
@@ -164,7 +182,7 @@ export default function DashboardPage() {
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <div className="flex items-center space-x-2 font-mono text-[10px] tracking-widest text-kage-text-muted uppercase">
+                <div className="flex items-center space-x-2 font-mono text-xs tracking-widest text-kage-text-muted uppercase">
                   <span className="h-1.5 w-1.5 bg-white" />
                   <span>DASHBOARD // OVERVIEW</span>
                   <span>•</span>
@@ -173,7 +191,7 @@ export default function DashboardPage() {
                 <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase">
                   {user?.display_name ? `${user.display_name}'s Watchlist` : "My Watchlist"}
                 </h1>
-                <p className="mt-1 text-xs text-kage-text-secondary">
+                <p className="mt-1 text-sm sm:text-base text-kage-text-secondary">
                   Keep track of what you&apos;re watching, what you&apos;ve finished, and what&apos;s next on your list.
                 </p>
               </div>
@@ -181,7 +199,7 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setIsImportOpen(true)}
-                  className="flex items-center space-x-2 border border-kage-border bg-kage-surface px-4 py-2.5 text-xs font-bold tracking-wider text-kage-text-primary transition-all hover:border-white active:scale-95 shadow-tactile uppercase"
+                  className="flex items-center space-x-2 border border-kage-border bg-kage-surface px-4 py-2.5 text-xs sm:text-sm font-bold tracking-wider text-kage-text-primary transition-all hover:border-white active:scale-95 shadow-tactile uppercase"
                 >
                   <UploadCloud className="h-4 w-4" />
                   <span>IMPORT LIST</span>
@@ -189,7 +207,7 @@ export default function DashboardPage() {
 
                 <button
                   onClick={() => setIsAddOpen(true)}
-                  className="flex items-center space-x-2 border border-white bg-white px-5 py-2.5 text-xs font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 shadow-tactile uppercase"
+                  className="flex items-center space-x-2 border border-white bg-white px-5 py-2.5 text-xs sm:text-sm font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 shadow-tactile uppercase"
                 >
                   <Plus className="h-4 w-4" />
                   <span>ADD ANIME</span>
@@ -200,61 +218,61 @@ export default function DashboardPage() {
             {/* KPI Metric Strip */}
             {stats && (
               <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 border-t border-kage-border/80 pt-6">
-                <div className="border border-kage-border bg-kage-bg p-3.5 shadow-tactile">
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-kage-text-muted">
+                <div className="border border-kage-border bg-kage-bg p-4 shadow-tactile">
+                  <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
                     Total Shows
                   </span>
-                  <div className="mt-1 font-mono text-xl font-extrabold text-white">
+                  <div className="mt-1 font-mono text-2xl font-extrabold text-white">
                     {stats.total_titles}
                   </div>
                 </div>
 
-                <div className="border border-kage-border bg-kage-bg p-3.5 shadow-tactile">
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-kage-text-muted">
+                <div className="border border-kage-border bg-kage-bg p-4 shadow-tactile">
+                  <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
                     Watching
                   </span>
-                  <div className="mt-1 font-mono text-xl font-extrabold text-white">
+                  <div className="mt-1 font-mono text-2xl font-extrabold text-white">
                     {stats.watching_count}
                   </div>
                 </div>
 
-                <div className="border border-kage-border bg-kage-bg p-3.5 shadow-tactile">
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-kage-text-muted">
+                <div className="border border-kage-border bg-kage-bg p-4 shadow-tactile">
+                  <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
                     Completed
                   </span>
-                  <div className="mt-1 font-mono text-xl font-extrabold text-white">
+                  <div className="mt-1 font-mono text-2xl font-extrabold text-white">
                     {stats.completed_count}
                   </div>
                 </div>
 
-                <div className="border border-kage-border bg-kage-bg p-3.5 shadow-tactile">
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-kage-text-muted">
+                <div className="border border-kage-border bg-kage-bg p-4 shadow-tactile">
+                  <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
                     Planned
                   </span>
-                  <div className="mt-1 font-mono text-xl font-extrabold text-white">
+                  <div className="mt-1 font-mono text-2xl font-extrabold text-white">
                     {stats.planned_count}
                   </div>
                 </div>
 
-                <div className="border border-kage-border bg-kage-bg p-3.5 shadow-tactile">
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-kage-text-muted">
+                <div className="border border-kage-border bg-kage-bg p-4 shadow-tactile">
+                  <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
                     Episodes Watched
                   </span>
-                  <div className="mt-1 font-mono text-xl font-extrabold text-white">
+                  <div className="mt-1 font-mono text-2xl font-extrabold text-white">
                     {stats.total_episodes_watched}
                   </div>
                 </div>
 
-                <div className="border border-kage-border bg-kage-bg p-3.5 flex items-center justify-between shadow-tactile">
+                <div className="border border-kage-border bg-kage-bg p-4 flex items-center justify-between shadow-tactile">
                   <div>
-                    <span className="font-mono text-[9px] uppercase tracking-wider text-kage-text-muted">
+                    <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
                       Completion
                     </span>
-                    <div className="mt-1 font-mono text-xl font-extrabold text-white">
+                    <div className="mt-1 font-mono text-2xl font-extrabold text-white">
                       {stats.completion_rate}%
                     </div>
                   </div>
-                  <ProgressRing value={stats.completion_rate} size={36} strokeWidth={3} showLabel={false} />
+                  <ProgressRing value={stats.completion_rate} size={38} strokeWidth={3} showLabel={false} />
                 </div>
               </div>
             )}
@@ -266,7 +284,7 @@ export default function DashboardPage() {
           {/* Spotlight Hero: Currently Screening Anime */}
           {spotlightAnime && (
             <section className="border border-kage-border bg-kage-surface shadow-2xl p-6 sm:p-8">
-              <div className="flex items-center justify-between border-b border-kage-border pb-3 font-mono text-[10px] text-kage-text-muted mb-6">
+              <div className="flex items-center justify-between border-b border-kage-border pb-3 font-mono text-xs text-kage-text-muted mb-6">
                 <span className="flex items-center space-x-2 text-white font-bold">
                   <span className="h-2 w-2 bg-white animate-pulse" />
                   <span>CURRENTLY WATCHING</span>
@@ -286,6 +304,9 @@ export default function DashboardPage() {
                       <img
                         src={spotlightAnime.poster_url}
                         alt={spotlightAnime.title}
+                        loading="eager"
+                        fetchPriority="high"
+                        decoding="async"
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (

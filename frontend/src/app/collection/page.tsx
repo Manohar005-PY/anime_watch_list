@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, Suspense } from "react";
+import React, { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, ChevronLeft, ChevronRight, Film, UploadCloud } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -12,6 +12,7 @@ import { AddAnimeModal } from "@/components/anime/AddAnimeModal";
 import { AnimeDetailModal } from "@/components/anime/AnimeDetailModal";
 import { ImportWizardModal } from "@/components/import/ImportWizardModal";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 function CollectionContent() {
   const router = useRouter();
@@ -20,6 +21,7 @@ function CollectionContent() {
 
   // State from URL or defaults
   const [search, setSearch] = useState(searchParams.get("q") || "");
+  const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get("q") || "");
   const [statusFilter, setStatusFilter] = useState<AnimeStatus | "ALL">(
     (searchParams.get("status") as AnimeStatus) || "ALL"
   );
@@ -39,33 +41,54 @@ function CollectionContent() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [initialLoaded, setInitialLoaded] = useState(false);
+
+  // Active request tracking to cancel/disregard obsolete responses
+  const activeRequestRef = useRef(0);
 
   // Modals
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<AnimeEntry | null>(null);
 
+  // Debounce search input by 300ms to avoid unnecessary API requests
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
   const fetchAnime = useCallback(async () => {
+    const requestId = ++activeRequestRef.current;
     try {
       setLoading(true);
       const res = await animeApi.list({
         status: statusFilter === "ALL" ? undefined : statusFilter,
         rating: ratingFilter || undefined,
-        q: search.trim() || undefined,
+        q: debouncedSearch.trim() || undefined,
         sort_by: sortBy,
         sort_order: sortOrder,
         page,
         page_size: 24,
       });
+
+      // Disregard response if a newer search/filter request was launched
+      if (requestId !== activeRequestRef.current) return;
+
       setAnimeList(res.items);
       setTotal(res.total);
       setTotalPages(res.total_pages);
     } catch (err: unknown) {
+      if (requestId !== activeRequestRef.current) return;
       console.error("Failed to load anime collection:", err);
     } finally {
-      setLoading(false);
+      if (requestId === activeRequestRef.current) {
+        setLoading(false);
+        setInitialLoaded(true);
+      }
     }
-  }, [statusFilter, ratingFilter, search, sortBy, sortOrder, page]);
+  }, [statusFilter, ratingFilter, debouncedSearch, sortBy, sortOrder, page]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -113,8 +136,23 @@ function CollectionContent() {
     }
   };
 
+  // Meaningful full-page loading state with authentic anime quote on first load
+  if (authLoading || (!initialLoaded && loading)) {
+    return (
+      <div className="flex min-h-screen flex-col bg-kage-bg">
+        <AppHeader />
+        <main className="flex flex-1 items-center justify-center">
+          <LoadingScreen
+            message="Loading your anime list..."
+            submessage="Retrieving your collection records"
+          />
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen flex-col bg-kage-bg">
+    <div className="flex min-h-screen flex-col bg-kage-bg text-kage-text-primary">
       <AppHeader
         onOpenAddModal={() => setIsAddOpen(true)}
         onOpenImportModal={() => setIsImportOpen(true)}
@@ -125,13 +163,13 @@ function CollectionContent() {
           {/* Header Title */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-kage-border pb-6">
             <div>
-              <span className="font-mono text-[10px] tracking-widest text-kage-text-muted uppercase">
+              <span className="font-mono text-xs tracking-widest text-kage-text-muted uppercase">
                 MY COLLECTION
               </span>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight text-white">
+              <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                 My Anime List
               </h1>
-              <p className="mt-1 text-xs text-kage-text-secondary">
+              <p className="mt-1 text-sm sm:text-base text-kage-text-secondary">
                 {total} {total === 1 ? "show" : "shows"} in your list.
               </p>
             </div>
@@ -139,7 +177,7 @@ function CollectionContent() {
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setIsImportOpen(true)}
-                className="flex items-center space-x-1.5 border border-kage-border bg-kage-surface px-4 py-2 text-xs font-semibold tracking-wider text-kage-text-primary transition-colors hover:border-white active:scale-95"
+                className="flex items-center space-x-2 border border-kage-border bg-kage-surface px-4 py-2.5 text-xs sm:text-sm font-semibold tracking-wider text-kage-text-primary transition-colors hover:border-white active:scale-95"
               >
                 <UploadCloud className="h-4 w-4" />
                 <span>Import Anime List</span>
@@ -147,7 +185,7 @@ function CollectionContent() {
 
               <button
                 onClick={() => setIsAddOpen(true)}
-                className="flex items-center space-x-1.5 border border-kage-text-primary bg-kage-text-primary px-4 py-2 text-xs font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95"
+                className="flex items-center space-x-2 border border-kage-text-primary bg-kage-text-primary px-4 py-2.5 text-xs sm:text-sm font-semibold tracking-wider text-kage-bg transition-transform hover:opacity-90 active:scale-95 shadow-tactile"
               >
                 <Plus className="h-4 w-4" />
                 <span>Add Anime</span>
@@ -210,7 +248,7 @@ function CollectionContent() {
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {animeList.map((anime) => (
                       <AnimeCard
                         key={anime.id}
@@ -227,28 +265,28 @@ function CollectionContent() {
 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
-                  <div className="mt-8 flex items-center justify-between border-t border-kage-border pt-4 font-mono text-xs">
+                  <div className="mt-8 flex items-center justify-between border-t border-kage-border pt-5 font-mono text-xs sm:text-sm">
                     <div className="text-kage-text-muted">
-                      Showing Page <span className="text-white">{page}</span> of{" "}
-                      <span className="text-white">{totalPages}</span>
+                      Showing Page <span className="text-white font-bold">{page}</span> of{" "}
+                      <span className="text-white font-bold">{totalPages}</span>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2.5">
                       <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page <= 1}
-                        className="flex items-center space-x-1 border border-kage-border px-3 py-1.5 text-kage-text-secondary hover:text-white disabled:opacity-30"
+                        className="flex items-center space-x-1.5 border border-kage-border px-3.5 py-2 text-kage-text-secondary hover:text-white disabled:opacity-30 transition-colors"
                       >
-                        <ChevronLeft className="h-3.5 w-3.5" />
+                        <ChevronLeft className="h-4 w-4" />
                         <span>Prev</span>
                       </button>
                       <button
                         onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                         disabled={page >= totalPages}
-                        className="flex items-center space-x-1 border border-kage-border px-3 py-1.5 text-kage-text-secondary hover:text-white disabled:opacity-30"
+                        className="flex items-center space-x-1.5 border border-kage-border px-3.5 py-2 text-kage-text-secondary hover:text-white disabled:opacity-30 transition-colors"
                       >
                         <span>Next</span>
-                        <ChevronRight className="h-3.5 w-3.5" />
+                        <ChevronRight className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -259,12 +297,12 @@ function CollectionContent() {
                 title={search || statusFilter !== "ALL" ? "No shows found" : "Your list is empty"}
                 description={
                   search || statusFilter !== "ALL"
-                    ? "We couldn't find any shows matching your search or filters."
-                    : "You haven't added any shows yet. Add your first anime or import your list!"
+                    ? "We couldn't find any shows matching your search or filters. Try adjusting your query."
+                    : "You haven't added any shows to your watchlist yet. Search and add your favorite anime or import your existing list."
                 }
-                actionLabel={search || statusFilter !== "ALL" ? "Clear Filters" : "Add Anime"}
+                actionLabel={search || statusFilter !== "ALL" ? "Reset Filters" : "Add Your First Anime"}
                 onAction={() => {
-                  if (search || statusFilter !== "ALL" || ratingFilter !== null) {
+                  if (search || statusFilter !== "ALL") {
                     setSearch("");
                     setStatusFilter("ALL");
                     setRatingFilter(null);
@@ -272,30 +310,37 @@ function CollectionContent() {
                     setIsAddOpen(true);
                   }
                 }}
-                isSearchEmpty={Boolean(search || statusFilter !== "ALL")}
               />
             )}
           </div>
         </div>
       </main>
 
+      {/* Add Anime Modal */}
       <AddAnimeModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         onAnimeAdded={() => fetchAnime()}
       />
 
-      <AnimeDetailModal
-        anime={selectedAnime}
-        isOpen={Boolean(selectedAnime)}
-        onClose={() => setSelectedAnime(null)}
-        onAnimeUpdated={() => fetchAnime()}
-        onAnimeDeleted={() => {
-          setSelectedAnime(null);
-          fetchAnime();
-        }}
-      />
+      {/* Detail Modal */}
+      {selectedAnime && (
+        <AnimeDetailModal
+          anime={selectedAnime}
+          isOpen={!!selectedAnime}
+          onClose={() => setSelectedAnime(null)}
+          onAnimeUpdated={(updated: AnimeEntry) => {
+            setAnimeList((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+            setSelectedAnime(updated);
+          }}
+          onAnimeDeleted={(id: string) => {
+            setAnimeList((prev) => prev.filter((item) => item.id !== id));
+            setSelectedAnime(null);
+          }}
+        />
+      )}
 
+      {/* Smart Import Wizard Modal */}
       <ImportWizardModal
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
@@ -307,7 +352,16 @@ function CollectionContent() {
 
 export default function CollectionPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-kage-bg flex items-center justify-center font-mono text-xs text-kage-text-muted">Loading collection...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen flex-col bg-kage-bg">
+          <AppHeader />
+          <main className="flex flex-1 items-center justify-center">
+            <LoadingScreen message="Loading collection..." />
+          </main>
+        </div>
+      }
+    >
       <CollectionContent />
     </Suspense>
   );

@@ -265,12 +265,12 @@ export function ImportWizardModal({
               影
             </span>
             <div>
-              <div className="flex items-center space-x-2 font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
+              <div className="flex items-center space-x-2 font-mono text-xs uppercase tracking-wider text-kage-text-muted">
                 <span>IMPORT SHOWS</span>
                 <span>•</span>
                 <span>ANIME LIST</span>
               </div>
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-white uppercase">
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white uppercase">
                 Import Anime List
               </h2>
             </div>
@@ -286,7 +286,7 @@ export function ImportWizardModal({
         </div>
 
         {/* Step Indicator Breadcrumbs */}
-        <div className="grid grid-cols-5 border-b border-kage-border bg-kage-bg font-mono text-[10px] tracking-wider uppercase">
+        <div className="grid grid-cols-5 border-b border-kage-border bg-kage-bg font-mono text-xs tracking-wider uppercase">
           {[
             { id: "INPUT", label: "1. Add Titles" },
             { id: "DISCOVERY", label: "2. Find Details" },
@@ -330,7 +330,7 @@ export function ImportWizardModal({
                 <button
                   type="button"
                   onClick={() => setInputTab("paste")}
-                  className={`flex-1 py-1.5 text-xs font-semibold tracking-wider transition-colors uppercase ${
+                  className={`flex-1 py-2 text-sm font-semibold tracking-wider transition-colors uppercase ${
                     inputTab === "paste"
                       ? "bg-white text-black"
                       : "text-kage-text-muted hover:text-white"
@@ -341,7 +341,7 @@ export function ImportWizardModal({
                 <button
                   type="button"
                   onClick={() => setInputTab("upload")}
-                  className={`flex-1 py-1.5 text-xs font-semibold tracking-wider transition-colors uppercase ${
+                  className={`flex-1 py-2 text-sm font-semibold tracking-wider transition-colors uppercase ${
                     inputTab === "upload"
                       ? "bg-white text-black"
                       : "text-kage-text-muted hover:text-white"
@@ -354,10 +354,10 @@ export function ImportWizardModal({
               {inputTab === "paste" ? (
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="font-mono text-xs text-kage-text-secondary uppercase">
+                    <label className="font-mono text-xs sm:text-sm text-kage-text-secondary uppercase">
                       Paste anime titles (One title per line)
                     </label>
-                    <span className="font-mono text-[11px] text-kage-text-muted">
+                    <span className="font-mono text-xs text-kage-text-muted">
                       Max 500 titles
                     </span>
                   </div>
@@ -369,17 +369,17 @@ export function ImportWizardModal({
                       if (previewRows.length > 0) setPreviewRows([]);
                     }}
                     placeholder={`Naruto\nDeath Note\nSteins;Gate\nFullmetal Alchemist: Brotherhood\nFrieren: Beyond Journey's End\nCowboy Bebop`}
-                    className="w-full border border-kage-border bg-kage-bg p-3.5 font-mono text-xs text-white placeholder-kage-text-muted/60 focus:border-white focus:outline-none focus:ring-0 leading-relaxed resize-y"
+                    className="w-full border border-kage-border bg-kage-bg p-3.5 font-mono text-sm text-white placeholder-kage-text-muted/60 focus:border-white focus:outline-none focus:ring-0 leading-relaxed resize-y"
                   />
                   <div className="mt-3 flex items-center justify-between">
-                    <p className="text-[11px] text-kage-text-muted">
+                    <p className="text-xs sm:text-sm text-kage-text-muted">
                       Titles will be defaulted to <strong>Plan to Watch</strong> status with 0 episodes watched.
                     </p>
                     <button
                       type="button"
                       disabled={parsing || !rawText.trim()}
                       onClick={() => handleParseContent(rawText, "text")}
-                      className="border border-kage-border bg-kage-surface px-4 py-1.5 text-xs font-bold text-white uppercase hover:border-white disabled:opacity-40"
+                      className="border border-kage-border bg-kage-surface px-4 py-2 text-sm font-bold text-white uppercase hover:border-white disabled:opacity-40"
                     >
                       {parsing ? "Parsing..." : "Review List"}
                     </button>
@@ -392,10 +392,10 @@ export function ImportWizardModal({
                     className="border-2 border-dashed border-kage-border hover:border-white p-8 text-center cursor-pointer transition-colors bg-kage-bg/40"
                   >
                     <UploadCloud className="mx-auto h-8 w-8 text-kage-text-muted mb-3" />
-                    <p className="text-xs font-medium text-white uppercase tracking-wider">
+                    <p className="text-sm font-medium text-white uppercase tracking-wider">
                       Click to select or drag and drop file
                     </p>
-                    <p className="text-[11px] font-mono text-kage-text-muted mt-1">
+                    <p className="text-xs font-mono text-kage-text-muted mt-1">
                       Supports .TXT (one title per line) or .CSV (with title, status, episodes, rating)
                     </p>
                     {fileName && (
@@ -417,14 +417,14 @@ export function ImportWizardModal({
 
               {/* Parsing Warnings / Errors */}
               {parseError && (
-                <div className="border border-red-500/40 bg-red-950/20 p-3 flex items-start space-x-2.5 text-xs text-red-300">
+                <div className="border border-red-500/40 bg-red-950/20 p-3 flex items-start space-x-2.5 text-sm text-red-300">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                   <span>{parseError}</span>
                 </div>
               )}
 
               {parseWarnings.length > 0 && (
-                <div className="border border-amber-500/40 bg-amber-950/20 p-3 text-xs text-amber-300 space-y-1">
+                <div className="border border-amber-500/40 bg-amber-950/20 p-3 text-sm text-amber-300 space-y-1">
                   {parseWarnings.map((w, idx) => (
                     <div key={idx} className="flex items-center space-x-2">
                       <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
@@ -434,20 +434,19 @@ export function ImportWizardModal({
                 </div>
               )}
 
-              {/* Preview Table */}
               {previewRows.length > 0 && (
                 <div className="space-y-3 pt-2 border-t border-kage-border">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs uppercase tracking-wider text-white">
+                    <span className="font-mono text-xs sm:text-sm uppercase tracking-wider text-white">
                       Parsed Preview ({previewRows.length} items found)
                     </span>
-                    <span className="font-mono text-[10px] text-kage-text-muted">
+                    <span className="font-mono text-xs text-kage-text-muted">
                       Ready to find show details
                     </span>
                   </div>
 
                   <div className="max-h-52 overflow-y-auto border border-kage-border bg-kage-bg text-xs">
-                    <table className="w-full text-left font-mono text-[11px]">
+                    <table className="w-full text-left font-mono text-xs">
                       <thead className="border-b border-kage-border bg-kage-surface sticky top-0 text-kage-text-muted uppercase">
                         <tr>
                           <th className="py-2 px-3">#</th>
@@ -475,7 +474,7 @@ export function ImportWizardModal({
                     </table>
                   </div>
                   {previewRows.length > 20 && (
-                    <p className="text-[10px] font-mono text-kage-text-muted text-right">
+                    <p className="text-xs font-mono text-kage-text-muted text-right">
                       Showing first 20 of {previewRows.length} items...
                     </p>
                   )}
@@ -496,10 +495,10 @@ export function ImportWizardModal({
               </div>
 
               <div>
-                <h3 className="text-lg font-bold uppercase tracking-tight text-white">
+                <h3 className="text-xl font-bold uppercase tracking-tight text-white">
                   Looking Up Show Details
                 </h3>
-                <p className="text-xs text-kage-text-secondary mt-1">
+                <p className="text-sm text-kage-text-secondary mt-1.5">
                   Finding posters, episode counts, and show information...
                 </p>
               </div>
@@ -512,7 +511,7 @@ export function ImportWizardModal({
                     style={{ width: `${discoveryProgress}%` }}
                   />
                 </div>
-                <div className="mt-2 flex justify-between font-mono text-[10px] text-kage-text-muted">
+                <div className="mt-2 flex justify-between font-mono text-xs text-kage-text-muted">
                   <span>Finding details</span>
                   <span>{discoveryProgress}%</span>
                 </div>
@@ -527,21 +526,21 @@ export function ImportWizardModal({
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-kage-border pb-3">
                 <div>
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+                  <h3 className="text-base font-bold uppercase tracking-wider text-white">
                     Review Matches
                   </h3>
-                  <p className="text-[11px] text-kage-text-secondary">
+                  <p className="text-xs sm:text-sm text-kage-text-secondary">
                     Check matching shows, change wrong matches, or skip shows you don&apos;t want.
                   </p>
                 </div>
-                <div className="flex items-center space-x-2 font-mono text-[11px]">
-                  <span className="border border-green-500/40 bg-green-950/20 px-2 py-0.5 text-green-300">
+                <div className="flex items-center space-x-2 font-mono text-xs">
+                  <span className="border border-green-500/40 bg-green-950/20 px-2.5 py-0.5 text-green-300">
                     {activeJob.items.filter((i) => i.status === "MATCHED").length} Matched
                   </span>
-                  <span className="border border-amber-500/40 bg-amber-950/20 px-2 py-0.5 text-amber-300">
+                  <span className="border border-amber-500/40 bg-amber-950/20 px-2.5 py-0.5 text-amber-300">
                     {activeJob.items.filter((i) => i.status === "AMBIGUOUS").length} Ambiguous
                   </span>
-                  <span className="border border-neutral-700 bg-neutral-900 px-2 py-0.5 text-neutral-400">
+                  <span className="border border-neutral-700 bg-neutral-900 px-2.5 py-0.5 text-neutral-400">
                     {activeJob.items.filter((i) => i.status === "UNMATCHED").length} Unmatched
                   </span>
                 </div>
@@ -576,40 +575,40 @@ export function ImportWizardModal({
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <span className="font-mono text-[9px] text-kage-text-muted">NO IMAGE</span>
+                            <span className="font-mono text-xs text-kage-text-muted">NO IMG</span>
                           )}
                         </div>
 
                         {/* Title details */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2 flex-wrap">
-                            <h4 className="text-xs font-bold text-white truncate">
+                          <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                            <h4 className="text-sm font-bold text-white truncate">
                               {item.matched_title || item.raw_title}
                             </h4>
                             {/* Confidence / Ambiguity Badge */}
                             {item.status === "MATCHED" && (
-                              <span className="font-mono text-[9px] text-green-400 border border-green-500/30 px-1.5 py-0.2">
+                              <span className="font-mono text-xs text-green-400 border border-green-500/30 px-2 py-0.5">
                                 {(item.match_confidence * 100).toFixed(0)}% MATCH
                               </span>
                             )}
                             {item.status === "AMBIGUOUS" && (
-                              <span className="font-mono text-[9px] text-amber-400 border border-amber-500/30 px-1.5 py-0.2">
+                              <span className="font-mono text-xs text-amber-400 border border-amber-500/30 px-2 py-0.5">
                                 AMBIGUOUS ({(item.match_confidence * 100).toFixed(0)}%)
                               </span>
                             )}
                             {item.status === "UNMATCHED" && (
-                              <span className="font-mono text-[9px] text-neutral-400 border border-neutral-700 px-1.5 py-0.2">
+                              <span className="font-mono text-xs text-neutral-400 border border-neutral-700 px-2 py-0.5">
                                 NO MATCH
                               </span>
                             )}
                             {item.is_duplicate && (
-                              <span className="font-mono text-[9px] text-sky-400 border border-sky-500/30 px-1.5 py-0.2">
+                              <span className="font-mono text-xs text-sky-400 border border-sky-500/30 px-2 py-0.5">
                                 ALREADY IN LIST
                               </span>
                             )}
                           </div>
 
-                          <p className="font-mono text-[10px] text-kage-text-muted mt-0.5">
+                          <p className="font-mono text-xs text-kage-text-muted mt-1">
                             Raw query: &quot;{item.raw_title}&quot;
                             {item.total_episodes && ` • ${item.total_episodes} eps`}
                             {item.match_warning && ` • ${item.match_warning}`}
@@ -617,12 +616,12 @@ export function ImportWizardModal({
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center space-x-1.5 shrink-0">
+                        <div className="flex items-center space-x-2 shrink-0">
                           {item.candidates_json && item.candidates_json.length > 1 && (
                             <button
                               type="button"
                               onClick={() => setCandidatePickerItemId(isPicking ? null : item.id)}
-                              className="border border-kage-border px-2 py-1 text-[10px] font-mono text-kage-text-secondary hover:border-white hover:text-white"
+                              className="border border-kage-border px-2.5 py-1 text-xs font-mono text-kage-text-secondary hover:border-white hover:text-white"
                             >
                               {isPicking ? "Close" : `Change (${item.candidates_json.length})`}
                             </button>
@@ -630,9 +629,9 @@ export function ImportWizardModal({
                           <button
                             type="button"
                             onClick={() => handleToggleSkip(item.id, item.status)}
-                            className={`border px-2 py-1 text-[10px] font-mono transition-colors ${
+                            className={`border px-2.5 py-1 text-xs font-mono transition-colors ${
                               isSkipped
-                                ? "border-white bg-white text-black"
+                                ? "border-white bg-white text-black font-semibold"
                                 : "border-kage-border text-kage-text-muted hover:text-white"
                             }`}
                           >
@@ -644,7 +643,7 @@ export function ImportWizardModal({
                       {/* Candidate Picker Drawer */}
                       {isPicking && item.candidates_json && (
                         <div className="mt-3 pt-3 border-t border-kage-border/80 space-y-2 animate-fade-in">
-                          <span className="font-mono text-[10px] uppercase text-kage-text-muted block">
+                          <span className="font-mono text-xs uppercase text-kage-text-muted block">
                             Pick the correct show from the results:
                           </span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -668,10 +667,10 @@ export function ImportWizardModal({
                                   <div className="h-10 w-8 bg-neutral-900 border border-kage-border shrink-0" />
                                 )}
                                 <div className="min-w-0 flex-1">
-                                  <div className="text-xs font-semibold text-white truncate">
+                                  <div className="text-sm font-semibold text-white truncate">
                                     {cand.canonical_title || cand.title}
                                   </div>
-                                  <div className="font-mono text-[9px] text-kage-text-muted">
+                                  <div className="font-mono text-xs text-kage-text-muted">
                                     {cand.total_episodes ? `${cand.total_episodes} eps` : "Ongoing"} •{" "}
                                     {cand.media_type || "TV"} • {cand.year || "—"}
                                   </div>
@@ -698,10 +697,10 @@ export function ImportWizardModal({
             <div className="space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-kage-border pb-3">
                 <div>
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+                  <h3 className="text-base font-bold uppercase tracking-wider text-white">
                     Shows Already in Your List
                   </h3>
-                  <p className="text-[11px] text-kage-text-secondary">
+                  <p className="text-xs sm:text-sm text-kage-text-secondary">
                     {duplicateItems.length > 0
                       ? `Found ${duplicateItems.length} show${duplicateItems.length > 1 ? "s" : ""} already in your list.`
                       : "Zero duplicates found! All items are unique additions to your list."}
@@ -709,26 +708,26 @@ export function ImportWizardModal({
                 </div>
 
                 {duplicateItems.length > 0 && (
-                  <div className="flex items-center space-x-1.5 font-mono text-[10px]">
+                  <div className="flex items-center space-x-2 font-mono text-xs">
                     <span className="text-kage-text-muted">Set all to:</span>
                     <button
                       type="button"
                       onClick={() => handleBatchDuplicateAction("update_metadata")}
-                      className="border border-kage-border px-2 py-1 text-kage-text-secondary hover:text-white hover:border-white"
+                      className="border border-kage-border px-2.5 py-1 text-kage-text-secondary hover:text-white hover:border-white"
                     >
                       Add Missing Details
                     </button>
                     <button
                       type="button"
                       onClick={() => handleBatchDuplicateAction("merge_progress")}
-                      className="border border-kage-border px-2 py-1 text-kage-text-secondary hover:text-white hover:border-white"
+                      className="border border-kage-border px-2.5 py-1 text-kage-text-secondary hover:text-white hover:border-white"
                     >
                       Update Everything
                     </button>
                     <button
                       type="button"
                       onClick={() => handleBatchDuplicateAction("skip")}
-                      className="border border-kage-border px-2 py-1 text-kage-text-secondary hover:text-white hover:border-white"
+                      className="border border-kage-border px-2.5 py-1 text-kage-text-secondary hover:text-white hover:border-white"
                     >
                       Skip All
                     </button>
@@ -739,10 +738,10 @@ export function ImportWizardModal({
               {duplicateItems.length === 0 ? (
                 <div className="py-12 text-center border border-dashed border-kage-border bg-kage-bg/40 space-y-3">
                   <CheckCircle2 className="mx-auto h-10 w-10 text-white" />
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-white">
+                  <h4 className="text-base font-bold uppercase tracking-wider text-white">
                     No Duplicates Found
                   </h4>
-                  <p className="text-xs text-kage-text-secondary max-w-md mx-auto">
+                  <p className="text-sm text-kage-text-secondary max-w-md mx-auto">
                     All shows are brand new to your list. Ready to save!
                   </p>
                 </div>
@@ -758,31 +757,31 @@ export function ImportWizardModal({
                       >
                         <div className="flex items-start justify-between">
                           <div>
-                            <span className="font-mono text-[9px] uppercase tracking-wider text-sky-400">
+                            <span className="font-mono text-xs uppercase tracking-wider text-sky-400">
                               Already in Your List
                             </span>
-                            <h4 className="text-xs font-bold text-white">
+                            <h4 className="text-sm font-bold text-white">
                               {item.matched_title || item.raw_title}
                             </h4>
                           </div>
-                          <span className="font-mono text-[10px] text-kage-text-muted">
+                          <span className="font-mono text-xs text-kage-text-muted">
                             Imported: {item.parsed_watched_episodes} eps • {item.parsed_status}
                           </span>
                         </div>
 
                         {/* Action buttons */}
-                        <div className="grid grid-cols-3 gap-2 font-mono text-[11px]">
+                        <div className="grid grid-cols-3 gap-2 font-mono text-xs">
                           <button
                             type="button"
                             onClick={() => handleSetDuplicateAction(item.id, "update_metadata")}
-                            className={`border p-2 text-left transition-colors ${
+                            className={`border p-2.5 text-left transition-colors ${
                               currentAction === "update_metadata"
                                 ? "border-white bg-white text-black font-bold"
                                 : "border-kage-border text-kage-text-muted hover:border-kage-border-focus hover:text-white"
                             }`}
                           >
-                            <div className="uppercase">Add Missing Details</div>
-                            <div className="text-[9px] opacity-80 font-sans mt-0.5">
+                            <div className="uppercase font-semibold">Add Missing Details</div>
+                            <div className="text-xs opacity-80 font-sans mt-0.5">
                               Only fill in missing poster and total episodes
                             </div>
                           </button>
@@ -790,14 +789,14 @@ export function ImportWizardModal({
                           <button
                             type="button"
                             onClick={() => handleSetDuplicateAction(item.id, "merge_progress")}
-                            className={`border p-2 text-left transition-colors ${
+                            className={`border p-2.5 text-left transition-colors ${
                               currentAction === "merge_progress"
                                 ? "border-white bg-white text-black font-bold"
                                 : "border-kage-border text-kage-text-muted hover:border-kage-border-focus hover:text-white"
                             }`}
                           >
-                            <div className="uppercase">Update Everything</div>
-                            <div className="text-[9px] opacity-80 font-sans mt-0.5">
+                            <div className="uppercase font-semibold">Update Everything</div>
+                            <div className="text-xs opacity-80 font-sans mt-0.5">
                               Update episodes watched, rating, and notes
                             </div>
                           </button>
@@ -805,14 +804,14 @@ export function ImportWizardModal({
                           <button
                             type="button"
                             onClick={() => handleSetDuplicateAction(item.id, "skip")}
-                            className={`border p-2 text-left transition-colors ${
+                            className={`border p-2.5 text-left transition-colors ${
                               currentAction === "skip"
                                 ? "border-white bg-white text-black font-bold"
                                 : "border-kage-border text-kage-text-muted hover:border-kage-border-focus hover:text-white"
                             }`}
                           >
-                            <div className="uppercase">Leave As Is</div>
-                            <div className="text-[9px] opacity-80 font-sans mt-0.5">
+                            <div className="uppercase font-semibold">Leave As Is</div>
+                            <div className="text-xs opacity-80 font-sans mt-0.5">
                               Keep your existing show details unchanged
                             </div>
                           </button>
@@ -835,10 +834,10 @@ export function ImportWizardModal({
               </div>
 
               <div>
-                <span className="font-mono text-[10px] uppercase tracking-widest text-kage-text-muted">
+                <span className="font-mono text-xs uppercase tracking-widest text-kage-text-muted">
                   IMPORT FINISHED
                 </span>
-                <h3 className="text-xl font-bold uppercase tracking-tight text-white mt-1">
+                <h3 className="text-2xl font-bold uppercase tracking-tight text-white mt-1">
                   Your List Has Been Updated!
                 </h3>
               </div>
@@ -846,24 +845,24 @@ export function ImportWizardModal({
               {/* Stats Strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl mx-auto border border-kage-border bg-kage-bg p-4 text-left font-mono">
                 <div>
-                  <span className="text-[9px] uppercase text-kage-text-muted">Added / Updated</span>
-                  <div className="text-xl font-bold text-white">{activeJob.imported_items}</div>
+                  <span className="text-xs uppercase text-kage-text-muted">Added / Updated</span>
+                  <div className="text-2xl font-bold text-white">{activeJob.imported_items}</div>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase text-kage-text-muted">Skipped</span>
-                  <div className="text-xl font-bold text-white">{activeJob.skipped_items}</div>
+                  <span className="text-xs uppercase text-kage-text-muted">Skipped</span>
+                  <div className="text-2xl font-bold text-white">{activeJob.skipped_items}</div>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase text-kage-text-muted">Failed</span>
-                  <div className="text-xl font-bold text-white">{activeJob.failed_items}</div>
+                  <span className="text-xs uppercase text-kage-text-muted">Failed</span>
+                  <div className="text-2xl font-bold text-white">{activeJob.failed_items}</div>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase text-kage-text-muted">Total Shows</span>
-                  <div className="text-xl font-bold text-white">{activeJob.total_items}</div>
+                  <span className="text-xs uppercase text-kage-text-muted">Total Shows</span>
+                  <div className="text-2xl font-bold text-white">{activeJob.total_items}</div>
                 </div>
               </div>
 
-              <p className="text-xs text-kage-text-secondary max-w-md mx-auto">
+              <p className="text-sm text-kage-text-secondary max-w-md mx-auto">
                 Your anime list and stats are now up to date!
               </p>
             </div>
@@ -877,7 +876,7 @@ export function ImportWizardModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-mono uppercase tracking-wider text-kage-text-muted hover:text-white"
+                className="px-4 py-2 text-sm font-mono uppercase tracking-wider text-kage-text-muted hover:text-white"
               >
                 Cancel
               </button>
@@ -885,7 +884,7 @@ export function ImportWizardModal({
                 type="button"
                 disabled={previewRows.length === 0 || jobLoading}
                 onClick={handleStartDiscovery}
-                className="flex items-center space-x-2 border border-white bg-white px-5 py-2 text-xs font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 disabled:opacity-30 uppercase"
+                className="flex items-center space-x-2 border border-white bg-white px-5 py-2.5 text-sm font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 disabled:opacity-30 uppercase"
               >
                 <span>Find Show Details</span>
                 <ArrowRight className="h-4 w-4" />
@@ -898,14 +897,14 @@ export function ImportWizardModal({
               <button
                 type="button"
                 onClick={() => setStep("INPUT")}
-                className="px-4 py-2 text-xs font-mono uppercase tracking-wider text-kage-text-muted hover:text-white"
+                className="px-4 py-2 text-sm font-mono uppercase tracking-wider text-kage-text-muted hover:text-white"
               >
                 Back
               </button>
               <button
                 type="button"
                 onClick={() => setStep("DUPLICATES")}
-                className="flex items-center space-x-2 border border-white bg-white px-5 py-2 text-xs font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 uppercase"
+                className="flex items-center space-x-2 border border-white bg-white px-5 py-2.5 text-sm font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 uppercase"
               >
                 <span>Next: Duplicates</span>
                 <ChevronRight className="h-4 w-4" />
@@ -918,7 +917,7 @@ export function ImportWizardModal({
               <button
                 type="button"
                 onClick={() => setStep("REVIEW")}
-                className="px-4 py-2 text-xs font-mono uppercase tracking-wider text-kage-text-muted hover:text-white"
+                className="px-4 py-2 text-sm font-mono uppercase tracking-wider text-kage-text-muted hover:text-white"
               >
                 Back
               </button>
@@ -926,7 +925,7 @@ export function ImportWizardModal({
                 type="button"
                 disabled={jobLoading}
                 onClick={handleConfirmImport}
-                className="flex items-center space-x-2 border border-white bg-white px-6 py-2 text-xs font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 disabled:opacity-30 uppercase"
+                className="flex items-center space-x-2 border border-white bg-white px-6 py-2.5 text-sm font-bold tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-95 disabled:opacity-30 uppercase"
               >
                 {jobLoading ? (
                   <span>Importing...</span>
@@ -945,7 +944,7 @@ export function ImportWizardModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="border border-white bg-white px-6 py-2 text-xs font-bold tracking-wider text-black transition-all hover:bg-neutral-200 uppercase"
+                className="border border-white bg-white px-6 py-2.5 text-sm font-bold tracking-wider text-black transition-all hover:bg-neutral-200 uppercase"
               >
                 Go to My List
               </button>

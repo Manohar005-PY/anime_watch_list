@@ -118,17 +118,17 @@ export function AnimeCard({
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="flex items-center space-x-2">
-              <span className="flex items-center space-x-1 border border-kage-border px-1.5 py-0.5 text-[9px] font-mono uppercase text-kage-text-secondary">
+            <div className="flex items-center space-x-2.5">
+              <span className="flex items-center space-x-1 border border-kage-border px-2 py-0.5 text-xs font-mono uppercase text-kage-text-secondary">
                 {getStatusIcon(anime.status)}
                 <span>{getStatusLabel(anime.status)}</span>
               </span>
-              <h3 className="truncate text-xs sm:text-sm font-bold text-white group-hover:underline">
+              <h3 className="truncate text-sm sm:text-base font-bold text-white group-hover:underline">
                 {anime.title}
               </h3>
             </div>
             {anime.alternate_title && (
-              <p className="truncate text-[10px] text-kage-text-muted mt-0.5">
+              <p className="truncate text-xs text-kage-text-muted mt-0.5">
                 {anime.alternate_title}
               </p>
             )}
@@ -137,13 +137,13 @@ export function AnimeCard({
 
         <div className="flex items-center space-x-3 sm:space-x-4 pl-4">
           {/* Episode Progress Counter */}
-          <div className="flex items-center space-x-1.5 font-mono text-xs">
+          <div className="flex items-center space-x-1.5 font-mono text-xs sm:text-sm">
             <span className="text-white font-bold">{anime.watched_episodes}</span>
             <span className="text-kage-text-muted">/</span>
             <span className="text-kage-text-muted">
               {anime.total_episodes ? anime.total_episodes : "—"}
             </span>
-            <span className="hidden sm:inline text-kage-text-muted text-[10px]">
+            <span className="hidden sm:inline text-kage-text-muted text-xs">
               ({progressPercent}%)
             </span>
           </div>
@@ -157,7 +157,7 @@ export function AnimeCard({
               aria-label={`Add 1 episode to ${anime.title}`}
               className="border border-kage-border bg-kage-surface-raised p-1.5 text-white hover:border-white hover:bg-white hover:text-black transition-colors"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
             </button>
           )}
 
@@ -168,14 +168,14 @@ export function AnimeCard({
               disabled={isUpdatingStatus}
               title="Mark as Completed"
               aria-label={`Mark ${anime.title} as completed`}
-              className="flex items-center space-x-1.5 border border-kage-border bg-kage-surface-raised px-2.5 py-1 text-xs font-mono text-neutral-300 hover:border-white hover:bg-white hover:text-black transition-colors"
+              className="flex items-center space-x-1.5 border border-kage-border bg-kage-surface-raised px-3 py-1 text-xs sm:text-sm font-mono text-neutral-300 hover:border-white hover:bg-white hover:text-black transition-colors"
             >
-              <Check className="h-3.5 w-3.5" />
+              <Check className="h-4 w-4" />
               <span className="hidden sm:inline">Mark Completed</span>
             </button>
           ) : (
-            <span className="hidden sm:flex items-center space-x-1 font-mono text-xs text-green-400">
-              <Check className="h-3.5 w-3.5" />
+            <span className="hidden sm:flex items-center space-x-1.5 font-mono text-xs sm:text-sm text-green-400">
+              <Check className="h-4 w-4" />
               <span>Completed</span>
             </span>
           )}
@@ -220,11 +220,12 @@ export function AnimeCard({
             alt={anime.title}
             onError={() => setImgError(true)}
             loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-106"
           />
         ) : (
           <div className="relative flex h-full w-full flex-col justify-between p-5 manga-screentone">
-            <div className="flex items-center justify-between font-mono text-[9px] text-neutral-500 border-b border-neutral-800 pb-2">
+            <div className="flex items-center justify-between font-mono text-xs text-neutral-500 border-b border-neutral-800 pb-2">
               <span>ANIME</span>
               <span>NO IMAGE</span>
             </div>
@@ -232,11 +233,11 @@ export function AnimeCard({
               <span className="font-mono text-4xl font-extrabold text-neutral-800 tracking-tighter">
                 影
               </span>
-              <p className="mt-2 text-xs font-bold text-neutral-300 line-clamp-2 px-2">
+              <p className="mt-2 text-sm font-bold text-neutral-300 line-clamp-2 px-2">
                 {anime.title}
               </p>
             </div>
-            <div className="border-t border-neutral-800 pt-2 font-mono text-[9px] text-neutral-600 flex justify-between">
+            <div className="border-t border-neutral-800 pt-2 font-mono text-xs text-neutral-500 flex justify-between">
               <span>Ep: {anime.watched_episodes}</span>
               <span>{getStatusLabel(anime.status)}</span>
             </div>
@@ -250,14 +251,14 @@ export function AnimeCard({
           className="absolute right-2 top-2 z-10 border border-black/80 bg-black/80 p-1.5 backdrop-blur-xs transition-transform active:scale-90"
         >
           <Star
-            className={`h-3.5 w-3.5 ${
+            className={`h-4 w-4 ${
               anime.is_favorite ? "fill-white text-white" : "text-neutral-500 hover:text-white"
             }`}
           />
         </button>
 
         {/* Status Badge */}
-        <div className="absolute left-2 top-2 z-10 flex items-center space-x-1 border border-black/80 bg-black/80 px-2 py-0.5 text-[9px] font-mono tracking-wider text-white backdrop-blur-xs">
+        <div className="absolute left-2 top-2 z-10 flex items-center space-x-1.5 border border-black/80 bg-black/80 px-2.5 py-1 text-xs font-mono tracking-wider text-white backdrop-blur-xs">
           {getStatusIcon(anime.status)}
           <span>{getStatusLabel(anime.status)}</span>
         </div>
@@ -274,20 +275,20 @@ export function AnimeCard({
       </div>
 
       {/* Card Content & Metadata */}
-      <div className="flex flex-1 flex-col justify-between p-3.5 bg-kage-surface-raised">
+      <div className="flex flex-1 flex-col justify-between p-4 bg-kage-surface-raised">
         <div>
-          <h3 className="line-clamp-1 text-xs sm:text-sm font-bold text-white group-hover:underline">
+          <h3 className="line-clamp-1 text-sm sm:text-base font-bold text-white group-hover:underline">
             {anime.title}
           </h3>
           {anime.alternate_title && (
-            <p className="line-clamp-1 font-mono text-[10px] text-kage-text-muted mt-0.5">
+            <p className="line-clamp-1 font-mono text-xs text-kage-text-muted mt-1">
               {anime.alternate_title}
             </p>
           )}
         </div>
 
         {/* Action Controls & Metric Strip */}
-        <div className="mt-3.5 flex items-center justify-between border-t border-kage-border/80 pt-2 font-mono text-[11px]">
+        <div className="mt-3.5 flex items-center justify-between border-t border-kage-border/80 pt-2.5 font-mono text-xs sm:text-sm">
           {/* Episode Counter */}
           <div className="flex items-center space-x-1 text-kage-text-secondary">
             <span>Ep</span>
@@ -298,7 +299,7 @@ export function AnimeCard({
             </span>
           </div>
 
-          <div className="flex items-center space-x-1.5">
+          <div className="flex items-center space-x-2">
             {/* Quick Increment (+1) Button */}
             {(!anime.total_episodes || anime.watched_episodes < anime.total_episodes) && (
               <button
@@ -306,9 +307,9 @@ export function AnimeCard({
                 disabled={isIncrementing}
                 title="Add 1 episode"
                 aria-label={`Add 1 episode to ${anime.title}`}
-                className="flex items-center space-x-0.5 border border-kage-border bg-black px-1.5 py-0.5 text-[10px] font-bold text-white transition-colors hover:border-white hover:bg-white hover:text-black"
+                className="flex items-center space-x-0.5 border border-kage-border bg-black px-2 py-1 text-xs font-bold text-white transition-colors hover:border-white hover:bg-white hover:text-black"
               >
-                <Plus className="h-3 w-3" />
+                <Plus className="h-3.5 w-3.5" />
                 <span>1</span>
               </button>
             )}
@@ -320,14 +321,14 @@ export function AnimeCard({
                 disabled={isUpdatingStatus}
                 title="Mark as Completed"
                 aria-label={`Mark ${anime.title} as completed`}
-                className="flex items-center space-x-1 border border-kage-border bg-black px-2 py-0.5 text-[10px] font-medium text-neutral-300 transition-colors hover:border-white hover:bg-white hover:text-black"
+                className="flex items-center space-x-1 border border-kage-border bg-black px-2.5 py-1 text-xs font-medium text-neutral-300 transition-colors hover:border-white hover:bg-white hover:text-black"
               >
-                <Check className="h-3 w-3" />
+                <Check className="h-3.5 w-3.5" />
                 <span>Done</span>
               </button>
             ) : (
-              <span className="flex items-center space-x-0.5 text-[10px] text-green-400 font-mono" title="Completed">
-                <Check className="h-3 w-3" />
+              <span className="flex items-center space-x-1 text-xs text-green-400 font-mono font-medium" title="Completed">
+                <Check className="h-3.5 w-3.5" />
                 <span>Done</span>
               </span>
             )}

@@ -22,6 +22,21 @@ export default {
           accent: "#FFFFFF",
         },
       },
+      fontSize: {
+        "kage-hero": ["clamp(2.25rem, 1.5rem + 3.5vw, 4.25rem)", { lineHeight: "1.05", letterSpacing: "-0.04em" }],
+        "kage-h1": ["clamp(1.75rem, 1.25rem + 1.8vw, 2.5rem)", { lineHeight: "1.15", letterSpacing: "-0.03em" }],
+        "kage-h2": ["clamp(1.375rem, 1.1rem + 1vw, 2rem)", { lineHeight: "1.25", letterSpacing: "-0.025em" }],
+        "kage-h3": ["clamp(1.125rem, 1rem + 0.4vw, 1.375rem)", { lineHeight: "1.35", letterSpacing: "-0.02em" }],
+        "kage-card-title": ["1.125rem", { lineHeight: "1.35", letterSpacing: "-0.015em" }], // 18px
+        "kage-lead": ["1.0625rem", { lineHeight: "1.6" }], // 17px
+        "kage-body": ["1rem", { lineHeight: "1.55" }], // 16px
+        "kage-body-sm": ["0.9375rem", { lineHeight: "1.5" }], // 15px
+        "kage-nav": ["0.9375rem", { lineHeight: "1.4", letterSpacing: "0.02em" }], // 15px
+        "kage-control": ["0.9375rem", { lineHeight: "1.4" }], // 15px
+        "kage-label": ["0.875rem", { lineHeight: "1.35", letterSpacing: "0.025em" }], // 14px
+        "kage-meta": ["0.8125rem", { lineHeight: "1.35", letterSpacing: "0.03em" }], // 13px
+        "kage-caption": ["0.75rem", { lineHeight: "1.3", letterSpacing: "0.04em" }], // 12px
+      },
       fontFamily: {
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
         sans: ["var(--font-sans)", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],

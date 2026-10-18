@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy import (
     Column, String, Integer, Boolean, Text, DateTime, Date,
-    ForeignKey, UniqueConstraint, CheckConstraint, JSON
+    ForeignKey, UniqueConstraint, CheckConstraint, JSON, Index
 )
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -63,4 +63,7 @@ class AnimeEntry(Base):
         UniqueConstraint("user_id", "normalized_title", name="uq_user_normalized_title"),
         CheckConstraint("watched_episodes >= 0", name="chk_watched_episodes_positive"),
         CheckConstraint("rating IS NULL OR (rating >= 1 AND rating <= 10)", name="chk_rating_range"),
+        Index("ix_anime_user_updated", "user_id", "updated_at"),
+        Index("ix_anime_user_status", "user_id", "status"),
+        Index("ix_anime_user_favorite", "user_id", "is_favorite"),
     )

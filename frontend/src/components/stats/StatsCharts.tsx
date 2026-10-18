@@ -34,13 +34,13 @@ export function StatsCharts({ stats }: StatsChartsProps) {
           return (
             <div
               key={m.label}
-              className="border border-kage-border bg-kage-surface p-4 flex flex-col justify-between"
+              className="border border-kage-border bg-kage-surface p-4 sm:p-5 flex flex-col justify-between shadow-tactile"
             >
               <div className="flex items-center justify-between text-kage-text-muted">
-                <span className="font-mono text-[9px] uppercase tracking-wider">{m.label}</span>
-                <Icon className="h-3 w-3" />
+                <span className="font-mono text-xs uppercase tracking-wider">{m.label}</span>
+                <Icon className="h-4 w-4" />
               </div>
-              <div className="mt-2 font-mono text-xl font-bold tracking-tight text-kage-text-primary">
+              <div className="mt-2 font-mono text-2xl sm:text-3xl font-extrabold tracking-tight text-kage-text-primary">
                 {m.value}
               </div>
             </div>
@@ -51,24 +51,24 @@ export function StatsCharts({ stats }: StatsChartsProps) {
       {/* Completion Rate & Status Distribution Row */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Completion Gauge Card */}
-        <div className="border border-kage-border bg-kage-surface p-6 flex flex-col justify-between">
+        <div className="border border-kage-border bg-kage-surface p-6 sm:p-7 flex flex-col justify-between shadow-tactile">
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
+            <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
               COMPLETION RATE
             </span>
-            <h3 className="text-sm font-semibold tracking-wide text-kage-text-primary mt-1">
+            <h3 className="text-base sm:text-lg font-bold tracking-wide text-kage-text-primary mt-1">
               How much you&apos;ve completed
             </h3>
-            <p className="mt-1 text-xs text-kage-text-muted">
+            <p className="mt-1 text-xs sm:text-sm text-kage-text-muted">
               Percentage of shows on your list marked as completed.
             </p>
           </div>
 
           <div className="my-6 flex items-center justify-center">
-            <ProgressRing value={stats.completion_rate} size={110} strokeWidth={6} />
+            <ProgressRing value={stats.completion_rate} size={120} strokeWidth={6} />
           </div>
 
-          <div className="border-t border-kage-border/80 pt-3 text-center font-mono text-xs text-kage-text-secondary">
+          <div className="border-t border-kage-border/80 pt-3 text-center font-mono text-xs sm:text-sm text-kage-text-secondary">
             <span>{stats.completed_count} completed</span>
             <span className="mx-2 text-kage-text-muted">/</span>
             <span>{stats.total_titles} total shows</span>
@@ -76,18 +76,18 @@ export function StatsCharts({ stats }: StatsChartsProps) {
         </div>
 
         {/* Status Distribution Horizontal Bars */}
-        <div className="border border-kage-border bg-kage-surface p-6 lg:col-span-2 flex flex-col justify-between">
+        <div className="border border-kage-border bg-kage-surface p-6 sm:p-7 lg:col-span-2 flex flex-col justify-between shadow-tactile">
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-kage-text-muted">
+            <span className="font-mono text-xs uppercase tracking-wider text-kage-text-muted">
               SHOW STATUSES
             </span>
-            <h3 className="text-sm font-semibold tracking-wide text-kage-text-primary mt-1">
+            <h3 className="text-base sm:text-lg font-bold tracking-wide text-kage-text-primary mt-1">
               Where your shows stand
             </h3>
           </div>
 
           {/* Progress stack */}
-          <div className="my-6 space-y-3">
+          <div className="my-6 space-y-3.5">
             {[
               {
                 label: "Watching",
@@ -118,13 +118,13 @@ export function StatsCharts({ stats }: StatsChartsProps) {
               const pct = stats.total_titles > 0 ? (item.count / stats.total_titles) * 100 : 0;
               return (
                 <div key={item.label}>
-                  <div className="flex justify-between font-mono text-xs text-kage-text-secondary mb-1">
-                    <span>{item.label}</span>
+                  <div className="flex justify-between font-mono text-xs sm:text-sm text-kage-text-secondary mb-1">
+                    <span className="font-medium text-white">{item.label}</span>
                     <span>
                       {item.count} ({Math.round(pct)}%)
                     </span>
                   </div>
-                  <div className="h-2 w-full bg-kage-bg overflow-hidden border border-kage-border">
+                  <div className="h-2.5 w-full bg-kage-bg overflow-hidden border border-kage-border">
                     <div
                       className={`h-full ${item.color} transition-all duration-500`}
                       style={{ width: `${pct}%` }}
@@ -135,7 +135,7 @@ export function StatsCharts({ stats }: StatsChartsProps) {
             })}
           </div>
 
-          <p className="font-mono text-[10px] text-kage-text-muted border-t border-kage-border/80 pt-3">
+          <p className="font-mono text-xs text-kage-text-muted border-t border-kage-border/80 pt-3">
             Updated automatically from your list.
           </p>
         </div>
