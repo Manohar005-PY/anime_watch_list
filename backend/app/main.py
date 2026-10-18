@@ -1,5 +1,6 @@
 import time
 import uuid
+import secrets
 import logging
 from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,6 +47,38 @@ async def security_and_timing_middleware(request: Request, call_next):
     # Avoid logging sensitive request paths with parameters
     sanitized_path = request.url.path
 
+    # OWASP CSRF Defense: Strict Origin verification on state-changing methods
+    if request.method in ["POST", "PUT", "PATCH", "DELETE"]:
+        origin = request.headers.get("Origin")
+        if origin and settings.ENFORCE_ORIGIN_CHECK:
+            allowed = set(settings.BACKEND_CORS_ORIGINS)
+            is_allowed = origin in allowed or (
+                settings.ENVIRONMENT != "production" and ("localhost" in origin or "127.0.0.1" in origin)
+            )
+            if not is_allowed:
+                logger.warning(
+                    f"CSRF Origin check failed: untrusted origin={origin} path={sanitized_path} request_id={request_id}"
+                )
+                return JSONResponse(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    content={"detail": "Cross-site request rejected: invalid Origin."}
+                )
+
+        # OWASP CSRF Defense: Double-Submit Token verification for browser-based authenticated mutations
+        session_cookie = request.cookies.get(settings.SESSION_COOKIE_NAME)
+        csrf_cookie = request.cookies.get(settings.CSRF_COOKIE_NAME)
+        # If user is using session cookies and a CSRF cookie was issued, require matching X-CSRF-Token header
+        if session_cookie and csrf_cookie:
+            csrf_header = request.headers.get("X-CSRF-Token")
+            if not csrf_header or csrf_header != csrf_cookie:
+                logger.warning(
+                    f"CSRF Token validation failed for path={sanitized_path} request_id={request_id}"
+                )
+                return JSONResponse(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    content={"detail": "CSRF validation failed: missing or invalid X-CSRF-Token."}
+                )
+
     try:
         response: Response = await call_next(request)
     except Exception as exc:
@@ -66,6 +99,19 @@ async def security_and_timing_middleware(request: Request, call_next):
         f'Request completed: method={request.method} path={sanitized_path} '
         f'status={response.status_code} request_id={request_id} duration_ms={duration_ms}'
     )
+
+    # Issue Double-Submit CSRF cookie if not present
+    if settings.CSRF_COOKIE_NAME not in request.cookies:
+        csrf_token = secrets.token_urlsafe(32)
+        response.set_cookie(
+            key=settings.CSRF_COOKIE_NAME,
+            value=csrf_token,
+            path="/",
+            httponly=False,  # Client JS reads this to set X-CSRF-Token header
+            secure=settings.SESSION_COOKIE_SECURE,
+            samesite="lax",
+            max_age=settings.SESSION_MAX_AGE_SECONDS
+        )
 
     # Set security headers
     response.headers["X-Request-ID"] = request_id

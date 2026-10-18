@@ -53,11 +53,11 @@ export function InteractiveLibraryDemo() {
   return (
     <div className="relative border border-kage-border bg-kage-surface p-6 sm:p-8 shadow-2xl overflow-hidden">
       {/* Decorative Technical Header */}
-      <div className="flex flex-wrap items-center justify-between border-b border-kage-border pb-4 font-mono text-[11px] text-kage-text-muted gap-2">
+      <div className="flex flex-wrap items-center justify-between border-b border-kage-border pb-4 font-mono text-[11px] text-kage-text-secondary gap-2">
         <div className="flex items-center space-x-2">
           <span className="h-2 w-2 bg-white animate-pulse" />
           <span className="text-white font-semibold">LIVE PREVIEW</span>
-          <span className="hidden sm:inline text-kage-text-muted">— TRY OUT THE CONTROLS</span>
+          <span className="hidden sm:inline text-kage-text-secondary">— TRY OUT THE CONTROLS</span>
         </div>
         <div className="flex items-center space-x-3">
           <span className="border border-kage-border px-2 py-0.5 text-[10px]">
@@ -231,12 +231,12 @@ export function InteractiveLibraryDemo() {
                   <button
                     key={starVal}
                     onClick={() => setRating(starVal)}
-                    className="p-0.5 text-neutral-600 hover:text-white transition-colors"
-                    title={`Rate ${starVal}/10`}
+                    aria-label={`Rate ${starVal} out of 10`}
+                    className="p-1.5 min-h-[32px] min-w-[28px] flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
                   >
                     <Star
-                      className={`h-3 w-3 ${
-                        starVal <= rating ? "fill-white text-white" : "text-neutral-700"
+                      className={`h-3.5 w-3.5 ${
+                        starVal <= rating ? "fill-white text-white" : "text-neutral-600"
                       }`}
                     />
                   </button>
@@ -249,7 +249,7 @@ export function InteractiveLibraryDemo() {
       </div>
 
       {/* Footer Disclaimer */}
-      <div className="mt-6 border-t border-kage-border/80 pt-3 flex items-center justify-between font-mono text-[10px] text-kage-text-muted">
+      <div className="mt-6 border-t border-kage-border/80 pt-3 flex items-center justify-between font-mono text-[10px] text-kage-text-secondary">
         <span>INTERACTIVE PREVIEW // CREATE AN ACCOUNT TO SAVE YOUR PROGRESS</span>
         <span>NO FAKE REVIEWS</span>
       </div>

@@ -53,6 +53,7 @@ yarn-error.log*
 .coverage
 htmlcov/
 .pytest_cache/
+lighthouse-*.json
 
 # OS & Editor
 .DS_Store

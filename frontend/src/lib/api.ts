@@ -89,12 +89,27 @@ class ApiError extends Error {
   }
 }
 
+function getCsrfToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|;\s*)kage_csrf=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
   const headers = new Headers(options.headers || {});
 
   if (!headers.has("Content-Type") && options.body && typeof options.body === "string") {
     headers.set("Content-Type", "application/json");
+  }
+
+  // Attach OWASP double-submit CSRF token for mutating requests
+  const method = (options.method || "GET").toUpperCase();
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !headers.has("X-CSRF-Token")) {
+    const token = getCsrfToken();
+    if (token) {
+      headers.set("X-CSRF-Token", token);
+    }
   }
 
   const res = await fetch(url, {

@@ -61,16 +61,36 @@ def test_logout_clears_session(client):
     email = "gendo@kage.internal"
     password = "DarkSecretPassword1!"
     client.post("/api/v1/auth/register", json={"email": email, "password": password})
-
     login_res = client.post("/api/v1/auth/login", json={"email": email, "password": password})
-    token = login_res.cookies[settings.SESSION_COOKIE_NAME]
+    assert login_res.status_code == 200
 
-    logout_res = client.post("/api/v1/auth/logout", cookies={settings.SESSION_COOKIE_NAME: token})
+    csrf_token = client.cookies.get(settings.CSRF_COOKIE_NAME, "")
+    logout_res = client.post(
+        "/api/v1/auth/logout",
+        headers={"X-CSRF-Token": csrf_token} if csrf_token else {}
+    )
     assert logout_res.status_code == 200
 
     # Now /me with the old token should be 401 Unauthorized
-    me_res = client.get("/api/v1/auth/me", cookies={settings.SESSION_COOKIE_NAME: token})
+    me_res = client.get("/api/v1/auth/me")
     assert me_res.status_code == 401
+
+
+def test_csrf_double_submit_protection(client):
+    """Verify that state-changing requests with session cookie but missing CSRF header fail with 403."""
+    email = "csrf_victim@kage.internal"
+    password = "SecretPassword123!"
+    client.post("/api/v1/auth/register", json={"email": email, "password": password})
+
+    login_res = client.post("/api/v1/auth/login", json={"email": email, "password": password})
+    assert login_res.status_code == 200
+    csrf_token = client.cookies.get(settings.CSRF_COOKIE_NAME)
+    assert csrf_token is not None
+
+    # Mutating request with valid session cookie and valid CSRF cookie, but MISSING X-CSRF-Token header
+    tampered_res = client.post("/api/v1/auth/logout")
+    assert tampered_res.status_code == 403
+    assert "CSRF validation failed" in tampered_res.json()["detail"]
 
 
 def test_password_reset_flow(client):

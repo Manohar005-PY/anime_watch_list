@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.api.deps import get_current_user, get_token_from_request
 from app.models.user import User
@@ -79,10 +80,10 @@ def request_password_reset(
     """Request password reset. Returns generic message to prevent account enumeration."""
     client_ip = request.client.host if request.client else "unknown"
     token = AuthService.request_password_reset(db, request_data, client_ip)
-    # Include dev token in detail if present in development
-    detail = f"Dev reset token: {token}" if token else ""
+    # Production security guarantee: Never expose reset tokens in responses or logs
+    detail = f"Dev reset token: {token}" if (token and settings.ENVIRONMENT != "production") else None
     return MessageResponse(
-        message="If an account exists with that email, password reset instructions have been created.",
+        message="If an account exists with that email, password reset instructions have been sent.",
         detail=detail
     )
 

@@ -23,6 +23,7 @@ from app.schemas.auth import (
     PasswordResetConfirm,
     ChangePasswordRequest
 )
+from app.services.email_service import EmailService
 
 
 class AuthService:
@@ -192,6 +193,13 @@ class AuthService:
             )
             db.add(reset_record)
             db.commit()
+
+            # Dispatch transactional email (logs never contain raw token)
+            EmailService.send_password_reset_email(
+                to_email=user.email,
+                token=raw_token,
+                display_name=user.display_name
+            )
 
         # In dev mode, return token so tests and local UI can test reset
         return raw_token if settings.ENVIRONMENT != "production" else None

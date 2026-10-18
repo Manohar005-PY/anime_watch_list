@@ -19,6 +19,22 @@ class Settings(BaseSettings):
     SESSION_MAX_AGE_SECONDS: int = 60 * 60 * 24 * 7  # 7 days
     PASSWORD_RESET_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # CSRF & Origin Defense
+    CSRF_COOKIE_NAME: str = "kage_csrf"
+    ENFORCE_ORIGIN_CHECK: bool = True
+
+    # Transactional Email (SMTP or Provider)
+    EMAIL_ENABLED: bool = True
+    EMAIL_PROVIDER: str = "console"  # "smtp", "console", "mock"
+    SMTP_HOST: Union[str, None] = None
+    SMTP_PORT: int = 587
+    SMTP_USER: Union[str, None] = None
+    SMTP_PASSWORD: Union[str, None] = None
+    SMTP_TLS: bool = True
+    EMAILS_FROM_EMAIL: str = "noreply@kage.app"
+    EMAILS_FROM_NAME: str = "KAGE Anime Library"
+    FRONTEND_URL: str = "http://localhost:3000"
+
     # Rate limiting
     RATE_LIMIT_LOGIN_MAX: int = 5
     RATE_LIMIT_WINDOW_SECONDS: int = 300
@@ -28,8 +44,12 @@ class Settings(BaseSettings):
     SCHEDULER_SECRET_TOKEN: str = "dev-scheduler-secret-token-change-in-production"
     METADATA_REFRESH_BATCH_SIZE: int = 50
 
-    # Database
+    # Database & Connection Pool Sizing (Cloud Run Scaled)
     DATABASE_URL: str = "postgresql://kage:kage_dev_secret@localhost:5432/kage_db"
+    DB_POOL_SIZE: int = 5
+    DB_MAX_OVERFLOW: int = 5
+    DB_POOL_TIMEOUT: int = 30
+    DB_POOL_RECYCLE: int = 1800
 
     # CORS
     BACKEND_CORS_ORIGINS: Union[str, List[str]] = [

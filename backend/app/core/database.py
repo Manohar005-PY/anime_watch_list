@@ -23,9 +23,11 @@ engine = create_engine(
     database_url,
     pool_pre_ping=True,
     connect_args=connect_args,
-    # Sensible pool size for Cloud Run horizontal scaling
-    pool_size=10 if not database_url.startswith("sqlite") else 5,
-    max_overflow=20 if not database_url.startswith("sqlite") else 10,
+    # Sized for Cloud Run auto-scaled container instances (prevents Cloud SQL pool exhaustion)
+    pool_size=settings.DB_POOL_SIZE if not database_url.startswith("sqlite") else 5,
+    max_overflow=settings.DB_MAX_OVERFLOW if not database_url.startswith("sqlite") else 5,
+    pool_timeout=settings.DB_POOL_TIMEOUT,
+    pool_recycle=settings.DB_POOL_RECYCLE,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

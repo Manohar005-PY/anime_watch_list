@@ -52,7 +52,7 @@ export function AnimeQuoteCard({
       <div className={`border-l-2 border-white pl-3 py-1 font-mono text-xs text-neutral-300 ${className}`}>
         <p className="italic text-white">&ldquo;{quote.quote}&rdquo;</p>
         <p className="mt-1 text-xs text-neutral-400">
-          — {quote.character}, <span className="text-neutral-500">{quote.anime}</span>
+          — {quote.character}, <span className="text-kage-text-secondary">{quote.anime}</span>
         </p>
       </div>
     );
@@ -71,7 +71,7 @@ export function AnimeQuoteCard({
           {quote.sourceReference && (
             <>
               <span className="text-kage-text-muted">•</span>
-              <span className="text-neutral-500">{quote.sourceReference}</span>
+              <span className="text-kage-text-secondary">{quote.sourceReference}</span>
             </>
           )}
         </div>
@@ -95,7 +95,7 @@ export function AnimeQuoteCard({
             VOICES OF CINEMA
           </span>
         </div>
-        <span className="text-xs text-neutral-500 uppercase">{quote.originalLanguage}</span>
+        <span className="text-xs text-kage-text-secondary uppercase">{quote.originalLanguage}</span>
       </div>
 
       {/* Primary Quotation */}
@@ -107,7 +107,7 @@ export function AnimeQuoteCard({
 
       {/* Japanese Original if present */}
       {quote.japaneseOriginal && (
-        <p className="mt-2 text-xs font-mono text-neutral-500 tracking-wide select-none">
+        <p className="mt-2 text-xs font-mono text-kage-text-secondary tracking-wide select-none">
           {quote.japaneseOriginal}
         </p>
       )}
@@ -119,11 +119,11 @@ export function AnimeQuoteCard({
           <span className="mx-2 text-kage-text-muted">/</span>
           <span className="text-neutral-300 font-medium">{quote.anime}</span>
         </div>
-        <span className="text-xs text-neutral-500">{quote.sourceReference}</span>
+        <span className="text-xs text-kage-text-secondary">{quote.sourceReference}</span>
       </div>
 
       {showSourceNote && quote.translationNote && (
-        <p className="mt-3 text-xs font-mono text-neutral-500 leading-normal border-t border-neutral-900 pt-2">
+        <p className="mt-3 text-xs font-mono text-kage-text-secondary leading-normal border-t border-neutral-900 pt-2">
           Note: {quote.translationNote}
         </p>
       )}

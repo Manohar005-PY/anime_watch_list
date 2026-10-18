@@ -74,7 +74,10 @@ export function EditorialShowcaseGallery() {
                 <img
                   src={anime.cover}
                   alt={anime.title}
-                  loading="lazy"
+                  loading={idx < 2 ? "eager" : "lazy"}
+                  decoding="async"
+                  // @ts-expect-error fetchpriority attribute supported in modern browsers
+                  fetchpriority={idx === 0 ? "high" : "auto"}
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-108"
                 />
 

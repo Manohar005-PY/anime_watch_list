@@ -18,7 +18,7 @@ export default {
           "border-focus": "#525252",
           "text-primary": "#F5F5F5",
           "text-secondary": "#A3A3A3",
-          "text-muted": "#737373",
+          "text-muted": "#8E8E8E",
           accent: "#FFFFFF",
         },
       },
